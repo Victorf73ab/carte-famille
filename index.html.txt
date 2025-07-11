@@ -1,61 +1,46 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <title>Carte familiale animée</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-timedimension/1.1.0/leaflet.timedimension.control.min.css" />
-  <style>
-    #map {{
-      width: 100%;
-      height: 100vh;
-    }}
-  </style>
-</head>
-<body>
-  <div id="map"></div>
-  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-timedimension/1.1.0/leaflet.timedimension.min.js"></script>
-  <script src="https://unpkg.com/leaflet-ajax"></script>
-  <script>
-    var map = L.map('map', {{
-      zoom: 6,
-      center: [46.5, 2.5],
-      timeDimension: true,
-      timeDimensionOptions: {{
-        timeInterval: "1993-01-01/2003-12-31",
-        period: "P1Y"
-      }},
-      timeDimensionControl: true,
-      timeDimensionControlOptions: {{
-        autoPlay: true,
-        loopButton: true,
-        timeSliderDragUpdate: true
-      }}
-    }});
+<style>
+  #map {
+    width: 100%;
+    height: 100vh;
+  }
+</style>
 
-    L.tileLayer('https://{{s}}.tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png', {{
-      attribution: '&copy; OpenStreetMap contributors'
-    }}).addTo(map);
+<script>
+  var map = L.map('map', {
+    zoom: 6,
+    center: [46.5, 2.5],
+    timeDimension: true,
+    timeDimensionOptions: {
+      timeInterval: "1993-01-01/2003-12-31",
+      period: "P1Y"
+    },
+    timeDimensionControl: true,
+    timeDimensionControlOptions: {
+      autoPlay: true,
+      loopButton: true,
+      timeSliderDragUpdate: true
+    }
+  });
 
-    var geojsonLayer = new L.GeoJSON.AJAX("famille.geojson", {{
-      onEachFeature: function (feature, layer) {{
-        if (feature.properties && feature.properties.popup) {{
-          layer.bindPopup(feature.properties.popup);
-        }}
-      }}
-    }});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
 
-    var timedGeoJSONLayer = L.timeDimension.layer.geoJson(geojsonLayer, {{
-      updateTimeDimension: true,
-      updateTimeDimensionMode: 'replace',
-      addlastPoint: false,
-      duration: 'P1Y'
-    }});
+  var geojsonLayer = new L.GeoJSON.AJAX("famille.geojson", {
+    onEachFeature: function (feature, layer) {
+      if (feature.properties && feature.properties.popup) {
+        layer.bindPopup(feature.properties.popup);
+      }
+    }
+  });
 
-    geojsonLayer.addTo(map);
-    timedGeoJSONLayer.addTo(map);
-  </script>
-</body>
-</html>
+  var timedGeoJSONLayer = L.timeDimension.layer.geoJson(geojsonLayer, {
+    updateTimeDimension: true,
+    updateTimeDimensionMode: 'replace',
+    addlastPoint: false,
+    duration: 'P1Y'
+  });
+
+  geojsonLayer.addTo(map);
+  timedGeoJSONLayer.addTo(map);
+</script>
