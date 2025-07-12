@@ -9,7 +9,7 @@
       },
       "geometry": {
         "type": "Point",
-        "coordinates": [2.3522, 48.8566]  // Paris
+        "coordinates": [2.3522, 48.8566]
       }
     },
     {
@@ -20,7 +20,7 @@
       },
       "geometry": {
         "type": "Point",
-        "coordinates": [5.3698, 43.2965]  // Marseille
+        "coordinates": [5.3698, 43.2965]
       }
     },
     {
@@ -31,7 +31,7 @@
       },
       "geometry": {
         "type": "Point",
-        "coordinates": [-1.5536, 47.2184]  // Nantes
+        "coordinates": [-1.5536, 47.2184]
       }
     },
     {
@@ -42,7 +42,7 @@
       },
       "geometry": {
         "type": "Point",
-        "coordinates": [4.8357, 45.7640]  // Lyon
+        "coordinates": [4.8357, 45.7640]
       }
     },
     {
@@ -53,7 +53,7 @@
       },
       "geometry": {
         "type": "Point",
-        "coordinates": [1.4442, 43.6047]  // Toulouse
+        "coordinates": [1.4442, 43.6047]
       }
     },
     {
@@ -64,7 +64,7 @@
       },
       "geometry": {
         "type": "Point",
-        "coordinates": [7.2620, 43.7102]  // Nice
+        "coordinates": [7.2620, 43.7102]
       }
     }
   ]
