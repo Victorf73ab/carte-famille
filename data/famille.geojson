@@ -4,8 +4,8 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Alice Dupont",
-        "year": 1990
+        "name": "Victor Fromentin",
+        "year": 1993
       },
       "geometry": {
         "type": "Point",
@@ -15,56 +15,111 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Alice Dupont",
+        "name": "Victor Fromentin",
+        "year": 1995
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [5.8792, 45.5883]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Victor Fromentin",
+        "year": 1997
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [5.8983, 45.5645]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Victor Fromentin",
         "year": 2000
       },
       "geometry": {
         "type": "Point",
-        "coordinates": [5.3698, 43.2965]
+        "coordinates": [5.8792, 45.5883]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "name": "Marc Dupont",
-        "year": 1990
+        "name": "Victor Fromentin",
+        "year": 2011
       },
       "geometry": {
         "type": "Point",
-        "coordinates": [-1.5536, 47.2184]
+        "coordinates": [5.7245, 45.1885]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "name": "Marc Dupont",
-        "year": 2000
+        "name": "Victor Fromentin",
+        "year": 2013
       },
       "geometry": {
         "type": "Point",
-        "coordinates": [4.8357, 45.7640]
+        "coordinates": [3.8767, 43.6111]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "name": "Sophie Martin",
-        "year": 2000
+        "name": "Victor Fromentin",
+        "year": 2014
       },
       "geometry": {
         "type": "Point",
-        "coordinates": [1.4442, 43.6047]
+        "coordinates": [16.6068, 49.1951]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "name": "Sophie Martin",
-        "year": 2010
+        "name": "Victor Fromentin",
+        "year": 2015
       },
       "geometry": {
         "type": "Point",
-        "coordinates": [7.2620, 43.7102]
+        "coordinates": [-74.7964, 10.9639]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Victor Fromentin",
+        "year": 2016
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [2.3522, 48.8566]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Victor Fromentin",
+        "year": 2017
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-74.0721, 4.7110]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Victor Fromentin",
+        "year": 2021
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-58.3816, -34.6037]
       }
     }
   ]
