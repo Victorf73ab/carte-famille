@@ -1,50 +1,65 @@
-// Initialisation de la carte centrée sur la France
-const map = L.map('map').setView([46.8, 2.5], 6);
-
-// Ajout des tuiles OpenStreetMap
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© OpenStreetMap contributors'
-}).addTo(map);
-
-// Tableau pour stocker les marqueurs
-let markers = [];
+// Dictionnaire des photos associées aux noms
 const photoMap = {
   "Alice Dupont": "images/victor.jpg",
   "Marc Dupont": "images/default.jpg",
   "Sophie Martin": "images/default.jpg"
 };
-// Fonction pour charger et afficher les données selon l'année
+
+// Initialisation de la carte
+const map = L.map('map').setView([46.8, 2.5], 6);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap contributors'
+}).addTo(map);
+
+let markers = [];
+
 function loadData(year) {
-  fetch('data/famille.geojson') // Assure-toi que le fichier est bien à la racine
+  fetch('famille.geojson')
     .then(response => response.json())
     .then(data => {
       // Supprimer les anciens marqueurs
       markers.forEach(marker => map.removeLayer(marker));
       markers = [];
 
-      // Parcourir les données GeoJSON
-data.features.forEach(feature => {
-  const featureYear = parseInt(feature.properties.year);
-  if (featureYear === year) {
-    const [lon, lat] = feature.geometry.coordinates;
-    const name = feature.properties.name;
-   const photoUrl = photoMap[name] || 'images/default.jpg';
+      // Dictionnaire des dernières positions connues
+      const latestLocations = {};
 
-    // Créer une icône personnalisée avec la photo
-    const customIcon = L.icon({
-      iconUrl: photoUrl,
-      iconSize: [50, 50],
-      iconAnchor: [25, 25],
-      popupAnchor: [0, -25]
-    });
+      // Parcourir toutes les entrées du GeoJSON
+      data.features.forEach(feature => {
+        const featureYear = parseInt(feature.properties.year);
+        const name = feature.properties.name;
 
-    // Créer le marqueur avec l'icône personnalisée
-    const marker = L.marker([lat, lon], { icon: customIcon })
-      .addTo(map)
-      .bindPopup(`<strong>${name}</strong><br>Année : ${year}`);
-    markers.push(marker);
-  }
-});
+        // Ignorer si l'entrée est dans le futur
+        if (featureYear <= year) {
+          const [lon, lat] = feature.geometry.coordinates;
+
+          // Met à jour la dernière position connue
+          latestLocations[name] = {
+            lat,
+            lon,
+            year: featureYear
+          };
+        }
+      });
+
+      // Afficher les marqueurs à partir des dernières positions connues
+      for (const name in latestLocations) {
+        const { lat, lon, year: lastYear } = latestLocations[name];
+        const photoUrl = photoMap[name] || 'images/default.jpg';
+
+        const customIcon = L.icon({
+          iconUrl: photoUrl,
+          iconSize: [50, 50],
+          iconAnchor: [25, 25],
+          popupAnchor: [0, -25]
+        });
+
+        const marker = L.marker([lat, lon], { icon: customIcon })
+          .addTo(map)
+          .bindPopup(`<strong>${name}</strong><br>Dernière position : ${lastYear}`);
+        markers.push(marker);
+      }
     })
     .catch(error => {
       console.error("Erreur lors du chargement du fichier GeoJSON :", error);
