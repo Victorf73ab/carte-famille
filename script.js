@@ -19,23 +19,13 @@ function loadData(year) {
       markers = [];
 
       // Parcourir les données GeoJSON
-    data.features.forEach(feature => {
+   data.features.forEach(feature => {
   const featureYear = parseInt(feature.properties.year);
   if (featureYear === year) {
     const [lon, lat] = feature.geometry.coordinates;
     const name = feature.properties.name;
-    const photoUrl = feature.properties.photo || 'images/default.jpg'; // image par défaut si absente
 
-    // Créer une icône personnalisée avec la photo
-    const customIcon = L.icon({
-      iconUrl: photoUrl,
-      iconSize: [50, 50],
-      iconAnchor: [25, 25],
-      popupAnchor: [0, -25]
-    });
-
-    // Créer le marqueur avec l'icône personnalisée
-    const marker = L.marker([lat, lon], { icon: customIcon })
+    const marker = L.marker([lat, lon])
       .addTo(map)
       .bindPopup(`<strong>${name}</strong><br>Année : ${year}`);
     markers.push(marker);
