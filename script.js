@@ -1,6 +1,6 @@
 // Dictionnaire des photos associées aux noms
 const photoMap = {
-  "Alice Dupont": "images/victor.jpg",
+  "Victor Fromentin": "images/victor.jpg",
   "Marc Dupont": "images/default.jpg",
   "Sophie Martin": "images/default.jpg"
 };
