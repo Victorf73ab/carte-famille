@@ -13,6 +13,26 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 let markers = [];
+// Initialisation dynamique du slider
+fetch('data/famille.geojson')
+  .then(response => response.json())
+  .then(data => {
+    const years = data.features.map(f => parseInt(f.properties.year));
+    const minYear = Math.min(...years);
+    const maxYear = 2025;
+
+    // Met à jour le slider
+    yearInput.min = minYear;
+    yearInput.max = maxYear;
+    yearInput.value = minYear;
+    yearLabel.textContent = minYear;
+
+    // Charge les données initiales
+    loadData(minYear);
+  })
+  .catch(error => {
+    console.error("Erreur lors de l'initialisation du slider :", error);
+  });
 
 function loadData(year) {
   fetch('data/famille.geojson')
@@ -75,6 +95,3 @@ yearInput.addEventListener('input', () => {
   yearLabel.textContent = selectedYear;
   loadData(selectedYear);
 });
-
-// Chargement initial
-loadData(parseInt(yearInput.value));
