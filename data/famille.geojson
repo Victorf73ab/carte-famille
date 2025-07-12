@@ -5,7 +5,8 @@
       "type": "Feature",
       "properties": {
         "name": "Victor Fromentin",
-        "year": 1993
+        "year": 1993,
+        "ville": "Paris"
       },
       "geometry": {
         "type": "Point",
@@ -16,7 +17,8 @@
       "type": "Feature",
       "properties": {
         "name": "Victor Fromentin",
-        "year": 1995
+        "year": 1995,
+        "ville": "La Motte Servolex"
       },
       "geometry": {
         "type": "Point",
@@ -27,7 +29,8 @@
       "type": "Feature",
       "properties": {
         "name": "Victor Fromentin",
-        "year": 1997
+        "year": 1997,
+        "ville": "Cognin"
       },
       "geometry": {
         "type": "Point",
@@ -38,7 +41,8 @@
       "type": "Feature",
       "properties": {
         "name": "Victor Fromentin",
-        "year": 2000
+        "year": 2000,
+        "ville": "La Motte Servolex"
       },
       "geometry": {
         "type": "Point",
@@ -49,7 +53,8 @@
       "type": "Feature",
       "properties": {
         "name": "Victor Fromentin",
-        "year": 2011
+        "year": 2011,
+        "ville": "Grenoble"
       },
       "geometry": {
         "type": "Point",
@@ -60,7 +65,8 @@
       "type": "Feature",
       "properties": {
         "name": "Victor Fromentin",
-        "year": 2013
+        "year": 2013,
+        "ville": "Montpellier"
       },
       "geometry": {
         "type": "Point",
@@ -71,7 +77,8 @@
       "type": "Feature",
       "properties": {
         "name": "Victor Fromentin",
-        "year": 2014
+        "year": 2014,
+        "ville": "Brno (République Tchèque)"
       },
       "geometry": {
         "type": "Point",
@@ -82,7 +89,8 @@
       "type": "Feature",
       "properties": {
         "name": "Victor Fromentin",
-        "year": 2015
+        "year": 2015,
+        "ville": "Barranquilla (Colombie)"
       },
       "geometry": {
         "type": "Point",
@@ -93,7 +101,8 @@
       "type": "Feature",
       "properties": {
         "name": "Victor Fromentin",
-        "year": 2016
+        "year": 2016,
+        "ville": "Paris"
       },
       "geometry": {
         "type": "Point",
@@ -104,7 +113,8 @@
       "type": "Feature",
       "properties": {
         "name": "Victor Fromentin",
-        "year": 2017
+        "year": 2017,
+        "ville": "Bogota (Colombie)"
       },
       "geometry": {
         "type": "Point",
@@ -115,7 +125,8 @@
       "type": "Feature",
       "properties": {
         "name": "Victor Fromentin",
-        "year": 2021
+        "year": 2021,
+        "ville": "Buenos Aires (Argentine)"
       },
       "geometry": {
         "type": "Point",
