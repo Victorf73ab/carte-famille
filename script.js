@@ -70,6 +70,7 @@ function loadData(year) {
   lat,
   lon,
   ville: feature.properties.ville,
+  info: feature.properties.info,
   year: featureYear
 };
         }
@@ -89,7 +90,11 @@ function loadData(year) {
 
         const marker = L.marker([lat, lon], { icon: customIcon })
           .addTo(map)
-        .bindPopup(`<strong>${name}</strong><br>${latestLocations[name].ville}`);
+        .bindPopup(`
+  <strong>${name}</strong><br>
+  ${latestLocations[name].ville}<br>
+  <em>${latestLocations[name].info || ''}</em>
+`);
         markers.push(marker);
       }
     })
