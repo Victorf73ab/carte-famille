@@ -2,7 +2,7 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #000; /* optionnel : fond sombre pour contraste */
+  background-color: #000; /* fond sombre pour contraste */
 }
 
 #map {
@@ -30,6 +30,17 @@ h1, h2 {
   background: transparent;
   padding: 10px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 🏷️ Label de l’année au-dessus du slider */
+#year-label {
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 8px;
 }
 
 /* 🎯 Slider stylisé */
@@ -38,13 +49,4 @@ h1, h2 {
   background: transparent;
   accent-color: #0077cc;
   cursor: pointer;
-}
-
-/* 🏷️ Label de l’année */
-#year-label {
-  display: inline-block;
-  margin-left: 10px;
-  font-weight: bold;
-  color: white;
-  font-size: 16px;
 }
