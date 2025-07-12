@@ -11,7 +11,7 @@ let markers = [];
 
 // Fonction pour charger et afficher les données selon l'année
 function loadData(year) {
-  fetch('famille.geojson') // Assure-toi que le fichier est bien à la racine
+  fetch('data/famille.geojson') // Assure-toi que le fichier est bien à la racine
     .then(response => response.json())
     .then(data => {
       // Supprimer les anciens marqueurs
