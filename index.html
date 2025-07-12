@@ -8,12 +8,16 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 </head>
 <body>
-  <div id="timeline">
-  <input type="range" id="year" step="1">
-  <span id="year-label"></span>
-</div>
+  <!-- 🗺️ Carte -->
   <div id="map"></div>
 
+  <!-- 🎚️ Timeline en bas de l'écran -->
+  <div id="timeline">
+    <div id="year-label">1993</div>
+    <input type="range" id="year" step="1">
+  </div>
+
+  <!-- 📦 Scripts -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="script.js"></script>
 </body>
