@@ -14,6 +14,12 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 let markers = [];
 
+// 🕷️ Initialisation du plugin OverlappingMarkerSpiderfier
+const oms = new OverlappingMarkerSpiderfier(map, {
+  keepSpiderfied: true,
+  nearbyDistance: 20
+});
+
 // 🎚️ Récupération des éléments du slider
 const yearInput = document.getElementById('year');
 const yearLabel = document.getElementById('year-label');
@@ -49,8 +55,10 @@ function loadData(year) {
   fetch('data/famille.geojson')
     .then(response => response.json())
     .then(data => {
+      // Supprimer les anciens marqueurs
       markers.forEach(marker => map.removeLayer(marker));
       markers = [];
+      oms.clearMarkers();
 
       const latestLocations = {};
 
@@ -80,18 +88,13 @@ function loadData(year) {
         locationGroups[key].push(name);
       }
 
-      // Afficher les marqueurs avec décalage
+      // Afficher les marqueurs avec spiderfier
       for (const key in locationGroups) {
         const group = locationGroups[key];
 
-        group.forEach((name, index) => {
+        group.forEach((name) => {
           const { lat, lon, ville, info } = latestLocations[name];
           const photoUrl = photoMap[name] || 'images/default.jpg';
-
-          // Décalage léger en latitude et longitude
-          const offset = 0.0005 * index;
-          const adjustedLat = lat + offset;
-          const adjustedLon = lon + offset;
 
           const customIcon = L.icon({
             iconUrl: photoUrl,
@@ -100,16 +103,23 @@ function loadData(year) {
             popupAnchor: [0, -25]
           });
 
-          const marker = L.marker([adjustedLat, adjustedLon], { icon: customIcon })
-            .addTo(map)
+          const marker = L.marker([lat, lon], { icon: customIcon })
             .bindPopup(`
               <strong>${name}</strong><br>
               ${ville}<br>
               <em>${info || ''}</em>
             `);
+
+          marker.addTo(map);
+          oms.addMarker(marker);
           markers.push(marker);
         });
       }
+
+      // Optionnel : ouvrir le popup au clic via OMS
+      oms.addListener('click', function(marker) {
+        marker.openPopup();
+      });
     })
     .catch(error => {
       console.error("Erreur lors du chargement du fichier GeoJSON :", error);
