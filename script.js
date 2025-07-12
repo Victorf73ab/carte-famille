@@ -1,11 +1,11 @@
-// Dictionnaire des photos associées aux noms
+// 📸 Dictionnaire des photos associées aux noms
 const photoMap = {
   "Victor Fromentin": "images/victor.jpg",
   "Marc Dupont": "images/default.jpg",
   "Sophie Martin": "images/default.jpg"
 };
 
-// Initialisation de la carte
+// 🗺️ Initialisation de la carte
 const map = L.map('map').setView([46.8, 2.5], 6);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -13,7 +13,12 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 let markers = [];
-// Initialisation dynamique du slider
+
+// 🎚️ Récupération des éléments du slider
+const yearInput = document.getElementById('year');
+const yearLabel = document.getElementById('year-label');
+
+// 📅 Initialisation dynamique du slider
 fetch('data/famille.geojson')
   .then(response => response.json())
   .then(data => {
@@ -21,19 +26,28 @@ fetch('data/famille.geojson')
     const minYear = Math.min(...years);
     const maxYear = 2025;
 
-    // Met à jour le slider
+    // Configuration du slider
     yearInput.min = minYear;
     yearInput.max = maxYear;
+    yearInput.step = 1;
     yearInput.value = minYear;
     yearLabel.textContent = minYear;
 
-    // Charge les données initiales
+    // Chargement initial
     loadData(minYear);
+
+    // Mise à jour de la carte quand le slider change
+    yearInput.addEventListener('input', () => {
+      const selectedYear = parseInt(yearInput.value);
+      yearLabel.textContent = selectedYear;
+      loadData(selectedYear);
+    });
   })
   .catch(error => {
     console.error("Erreur lors de l'initialisation du slider :", error);
   });
 
+// 📍 Fonction principale pour afficher les points
 function loadData(year) {
   fetch('data/famille.geojson')
     .then(response => response.json())
@@ -50,11 +64,8 @@ function loadData(year) {
         const featureYear = parseInt(feature.properties.year);
         const name = feature.properties.name;
 
-        // Ignorer si l'entrée est dans le futur
         if (featureYear <= year) {
           const [lon, lat] = feature.geometry.coordinates;
-
-          // Met à jour la dernière position connue
           latestLocations[name] = {
             lat,
             lon,
@@ -86,12 +97,3 @@ function loadData(year) {
     });
 }
 
-// Gestion du slider de l'année
-const yearInput = document.getElementById('year');
-const yearLabel = document.getElementById('year-label');
-
-yearInput.addEventListener('input', () => {
-  const selectedYear = parseInt(yearInput.value);
-  yearLabel.textContent = selectedYear;
-  loadData(selectedYear);
-});
