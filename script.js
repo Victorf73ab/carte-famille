@@ -15,7 +15,7 @@ function loadData(year) {
       markers = [];
 
       data.features.forEach(feature => {
-        if (feature.properties.year === year) {
+        if (parseInt(feature.properties.year) === year) {
           const [lon, lat] = feature.geometry.coordinates;
           const marker = L.marker([lat, lon])
             .addTo(map)
