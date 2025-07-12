@@ -66,11 +66,12 @@ function loadData(year) {
 
         if (featureYear <= year) {
           const [lon, lat] = feature.geometry.coordinates;
-          latestLocations[name] = {
-            lat,
-            lon,
-            year: featureYear
-          };
+         latestLocations[name] = {
+  lat,
+  lon,
+  ville: feature.properties.ville,
+  year: featureYear
+};
         }
       });
 
@@ -88,7 +89,7 @@ function loadData(year) {
 
         const marker = L.marker([lat, lon], { icon: customIcon })
           .addTo(map)
-          .bindPopup(`<strong>${name}</strong><br>Dernière position : ${lastYear}`);
+        .bindPopup(`<strong>${name}</strong><br>${latestLocations[name].ville}`);
         markers.push(marker);
       }
     })
