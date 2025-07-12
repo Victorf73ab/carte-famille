@@ -8,7 +8,11 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 // Tableau pour stocker les marqueurs
 let markers = [];
-
+const photoMap = {
+  "ALice Dupont": "images/victor.jpg",
+  "Marc Dupont": "images/default.jpg",
+  "Sophie Martin": "images/default.jpg"
+};
 // Fonction pour charger et afficher les données selon l'année
 function loadData(year) {
   fetch('data/famille.geojson') // Assure-toi que le fichier est bien à la racine
@@ -24,7 +28,7 @@ data.features.forEach(feature => {
   if (featureYear === year) {
     const [lon, lat] = feature.geometry.coordinates;
     const name = feature.properties.name;
-    const photoUrl = feature.properties.photo || 'images/default.jpg'; // image par défaut si absente
+   const photoUrl = photoMap[name] || 'images/default.jpg';
 
     // Créer une icône personnalisée avec la photo
     const customIcon = L.icon({
