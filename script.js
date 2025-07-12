@@ -15,7 +15,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 let markers = [];
 
 function loadData(year) {
-  fetch('famille.geojson')
+  fetch('data/famille.geojson')
     .then(response => response.json())
     .then(data => {
       // Supprimer les anciens marqueurs
