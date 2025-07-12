@@ -6,7 +6,6 @@
       "properties": {
         "name": "Alice Dupont",
         "year": 1990
-        "photo": "images/victor.jpg"
       },
       "geometry": {
         "type": "Point",
