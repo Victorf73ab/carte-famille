@@ -1,6 +1,6 @@
 // 📸 Dictionnaire des photos associées aux noms
 const photoMap = {
-  "Victor Fromentin": "images/victor.jpg",
+  "Victor Fromentin": "images/victorperso.jpg",
   "Marc Dupont": "images/default.jpg",
   "Sophie Martin": "images/default.jpg"
 };
