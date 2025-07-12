@@ -26,17 +26,14 @@ fetch('data/famille.geojson')
     const minYear = Math.min(...years);
     const maxYear = 2025;
 
-    // Configuration du slider
     yearInput.min = minYear;
     yearInput.max = maxYear;
     yearInput.step = 1;
     yearInput.value = minYear;
     yearLabel.textContent = minYear;
 
-    // Chargement initial
     loadData(minYear);
 
-    // Mise à jour de la carte quand le slider change
     yearInput.addEventListener('input', () => {
       const selectedYear = parseInt(yearInput.value);
       yearLabel.textContent = selectedYear;
@@ -52,54 +49,69 @@ function loadData(year) {
   fetch('data/famille.geojson')
     .then(response => response.json())
     .then(data => {
-      // Supprimer les anciens marqueurs
       markers.forEach(marker => map.removeLayer(marker));
       markers = [];
 
-      // Dictionnaire des dernières positions connues
       const latestLocations = {};
 
-      // Parcourir toutes les entrées du GeoJSON
+      // Récupérer la dernière position connue pour chaque personne
       data.features.forEach(feature => {
         const featureYear = parseInt(feature.properties.year);
         const name = feature.properties.name;
 
         if (featureYear <= year) {
           const [lon, lat] = feature.geometry.coordinates;
-         latestLocations[name] = {
-  lat,
-  lon,
-  ville: feature.properties.ville,
-  info: feature.properties.info,
-  year: featureYear
-};
+          latestLocations[name] = {
+            lat,
+            lon,
+            ville: feature.properties.ville,
+            info: feature.properties.info,
+            year: featureYear
+          };
         }
       });
 
-      // Afficher les marqueurs à partir des dernières positions connues
+      // Regrouper les personnes par position
+      const locationGroups = {};
       for (const name in latestLocations) {
-        const { lat, lon, year: lastYear } = latestLocations[name];
-        const photoUrl = photoMap[name] || 'images/default.jpg';
+        const { lat, lon } = latestLocations[name];
+        const key = `${lat.toFixed(5)}_${lon.toFixed(5)}`;
+        if (!locationGroups[key]) locationGroups[key] = [];
+        locationGroups[key].push(name);
+      }
 
-        const customIcon = L.icon({
-          iconUrl: photoUrl,
-          iconSize: [50, 50],
-          iconAnchor: [25, 25],
-          popupAnchor: [0, -25]
+      // Afficher les marqueurs avec décalage
+      for (const key in locationGroups) {
+        const group = locationGroups[key];
+
+        group.forEach((name, index) => {
+          const { lat, lon, ville, info } = latestLocations[name];
+          const photoUrl = photoMap[name] || 'images/default.jpg';
+
+          // Décalage léger en latitude et longitude
+          const offset = 0.0005 * index;
+          const adjustedLat = lat + offset;
+          const adjustedLon = lon + offset;
+
+          const customIcon = L.icon({
+            iconUrl: photoUrl,
+            iconSize: [50, 50],
+            iconAnchor: [25, 25],
+            popupAnchor: [0, -25]
+          });
+
+          const marker = L.marker([adjustedLat, adjustedLon], { icon: customIcon })
+            .addTo(map)
+            .bindPopup(`
+              <strong>${name}</strong><br>
+              ${ville}<br>
+              <em>${info || ''}</em>
+            `);
+          markers.push(marker);
         });
-
-        const marker = L.marker([lat, lon], { icon: customIcon })
-          .addTo(map)
-        .bindPopup(`
-  <strong>${name}</strong><br>
-  ${latestLocations[name].ville}<br>
-  <em>${latestLocations[name].info || ''}</em>
-`);
-        markers.push(marker);
       }
     })
     .catch(error => {
       console.error("Erreur lors du chargement du fichier GeoJSON :", error);
     });
 }
-
