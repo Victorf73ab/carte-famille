@@ -9,7 +9,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 // Tableau pour stocker les marqueurs
 let markers = [];
 const photoMap = {
-  "ALice Dupont": "images/victor.jpg",
+  "Alice Dupont": "images/victor.jpg",
   "Marc Dupont": "images/default.jpg",
   "Sophie Martin": "images/default.jpg"
 };
