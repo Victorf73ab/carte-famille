@@ -117,22 +117,32 @@ function loadDataFromArray(data, photoMap, year) {
     if (lines.length === 0) continue;
 
     let lastValidLine = null;
-    let hasStopped = false;
+    let blocked = false;
 
     for (const line of lines) {
-  const info = line.info ? line.info.toLowerCase() : '';
-  const isStop = info.includes("stop") || info.includes("décès") || info.includes("divorce");
+      const info = line.info ? line.info.toLowerCase() : '';
+      const isStop = info.includes("stop");
+      const isFinal = info.includes("décès") || info.includes("divorce");
 
-  if (isStop) {
-    hasStopped = true;
-  }
+      if (isStop && line.year <= year) {
+        blocked = true;
+        break;
+      }
 
-  if (!hasStopped) {
-    lastValidLine = line;
-  }
-}
+      if (isFinal) {
+        if (line.year === year) {
+          lastValidLine = line;
+        }
+        blocked = true;
+        break;
+      }
 
-    if (lastValidLine && !hasStopped) {
+      if (!blocked) {
+        lastValidLine = line;
+      }
+    }
+
+    if (lastValidLine) {
       latestLocations[name] = {
         lat: lastValidLine.lat,
         lon: lastValidLine.lon,
