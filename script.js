@@ -192,7 +192,6 @@ function loadDataFromArray(data, photoMap, year) {
                 <em>${info}</em>
               `);
 
-            marker.addTo(map); // 👈 rend le marqueur visible
             oms.addMarker(marker);
             markers.push(marker);
           });
