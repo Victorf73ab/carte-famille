@@ -107,15 +107,10 @@ function loadDataFromArray(data, photoMap, year) {
     const isDivorced = infoText.includes("divorce");
     const isStopped = infoText.includes("stop");
 
-    let endYear = Infinity;
-    if (isDeceased || isDivorced) {
-      endYear = person.year + 1;
-    }
+    const isLimited = isDeceased || isDivorced || isStopped;
+    const isVisible = isLimited ? year === person.year : person.year <= year;
 
-    if (
-      (isStopped && year === person.year) ||
-      (!isStopped && person.year <= year && year < endYear)
-    ) {
+    if (isVisible) {
       latestLocations[person.name] = {
         lat: person.lat,
         lon: person.lon,
