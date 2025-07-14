@@ -239,7 +239,6 @@ function loadDataFromArray(data, photoMap, year) {
   setTimeout(() => {
     if (markers.length > 0) {
       const bounds = L.latLngBounds(markers.map(m => m.getLatLng()));
-      map.fitBounds(bounds, { padding: [50, 50] });
     }
   }, 600);
 }
