@@ -4,14 +4,49 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Carte familiale avec timeline</title>
-  <link rel="stylesheet" href="style.css" />
+
+  <!-- 🧼 Feuilles de style -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    /* 🌍 Carte plein écran sauf timeline */
+    body {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      font-family: sans-serif;
+    }
+
+    #map {
+      flex: 1;
+    }
+
+    /* 🎚️ Timeline en bas */
+    #timeline {
+      padding: 10px;
+      background: white;
+      border-top: 1px solid #ccc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #year-label {
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+
+    #year {
+      width: 300px;
+    }
+  </style>
 </head>
 <body>
   <!-- 🗺️ Carte -->
   <div id="map"></div>
 
-  <!-- 🎚️ Timeline en bas de l'écran -->
+  <!-- 🎚️ Timeline -->
   <div id="timeline">
     <div id="year-label">1993</div>
     <input type="range" id="year" step="1">
