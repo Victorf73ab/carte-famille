@@ -103,18 +103,19 @@ function loadDataFromArray(data, photoMap, year) {
 
   data.forEach(person => {
     const infoText = person.info ? person.info.toLowerCase() : '';
-const isDeceased = infoText.includes("décès");
-const isDivorced = infoText.includes("divorce");
-const isStopped = infoText.includes("stop");
+    const isDeceased = infoText.includes("décès");
+    const isDivorced = infoText.includes("divorce");
+    const isStopped = infoText.includes("stop");
 
-let endYear = Infinity;
-if (isDeceased || isDivorced) {
-  endYear = person.year + 1;
-} else if (isStopped) {
-  endYear = person.year; // visible uniquement l’année indiquée
-}
+    let endYear = Infinity;
+    if (isDeceased || isDivorced) {
+      endYear = person.year + 1;
+    }
 
-    if (person.year <= year && year <= endYear) {
+    if (
+      (isStopped && year === person.year) ||
+      (!isStopped && person.year <= year && year < endYear)
+    ) {
       latestLocations[person.name] = {
         lat: person.lat,
         lon: person.lon,
@@ -198,7 +199,7 @@ if (isDeceased || isDivorced) {
                 <em>${info}</em>
               `);
 
-            marker.addTo(map); // ✅ rend le marqueur visible
+            marker.addTo(map);
             oms.addMarker(marker);
             markers.push(marker);
           });
