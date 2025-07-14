@@ -100,43 +100,27 @@ function loadDataFromArray(data, photoMap, year) {
   oms.clearMarkers();
 
   const latestLocations = {};
-  const personState = {};
 
-  // Trier toutes les lignes par année croissante
-  const sortedData = data
-    .filter(p => p.name && !isNaN(p.year) && p.year <= year)
-    .sort((a, b) => a.year - b.year);
+data.forEach(person => {
+  const infoText = person.info ? person.info.toLowerCase() : '';
+  const isDeceased = infoText.includes("décès");
+  const isDivorced = infoText.includes("divorce");
+  const isStopped = infoText.includes("stop");
 
-  // Parcourir chaque ligne chronologiquement
-  sortedData.forEach(person => {
-    const name = person.name;
-    const info = person.info ? person.info.toLowerCase() : '';
-    const isStop = info.includes("stop") || info.includes("décès") || info.includes("divorce");
+  const isLimited = isDeceased || isDivorced || isStopped;
+  const isVisible = isLimited ? year === person.year : person.year <= year;
 
-    if (!personState[name]) {
-      personState[name] = { active: false, lastLine: null };
-    }
-
-    if (isStop) {
-      personState[name].active = false;
-    } else {
-      personState[name].active = true;
-      personState[name].lastLine = person;
-    }
-  });
-
-  for (const name in personState) {
-    const state = personState[name];
-    if (state.active && state.lastLine) {
-      latestLocations[name] = {
-        lat: state.lastLine.lat,
-        lon: state.lastLine.lon,
-        ville: state.lastLine.ville,
-        info: state.lastLine.info,
-        year: state.lastLine.year
-      };
-    }
+  if (isVisible) {
+    latestLocations[person.name] = {
+      lat: person.lat,
+      lon: person.lon,
+      ville: person.ville,
+      info: person.info,
+      year: person.year
+    };
   }
+});
+
 
   const locationGroups = {};
   for (const name in latestLocations) {
