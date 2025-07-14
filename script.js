@@ -126,11 +126,13 @@ function loadDataFromArray(data, photoMap, year) {
 
   for (const key in locationGroups) {
     const group = locationGroups[key];
+    const { lat, lon } = latestLocations[group[0]];
+    const ville = latestLocations[group[0]].ville;
 
     if (group.length === 1) {
       const name = group[0];
-      const { lat, lon, ville, info } = latestLocations[name];
-      const rawPhotoUrl = photoMap[name] || photoMap["Groupe"] || 'images/default.jpg';
+      const info = latestLocations[name].info || '';
+      const rawPhotoUrl = photoMap[name] || 'images/default.jpg';
 
       validateImage(rawPhotoUrl).then(validPhotoUrl => {
         const customIcon = L.icon({
@@ -144,7 +146,7 @@ function loadDataFromArray(data, photoMap, year) {
           .bindPopup(`
             <strong>${name}</strong><br>
             ${ville}<br>
-            <em>${info || ''}</em>
+            <em>${info}</em>
           `);
 
         marker.addTo(map);
@@ -152,14 +154,8 @@ function loadDataFromArray(data, photoMap, year) {
         markers.push(marker);
       });
     } else {
-      const { lat, lon } = latestLocations[group[0]];
-      const ville = latestLocations[group[0]].ville;
+      // 📸 Marqueur principal avec image de groupe
       const rawGroupPhoto = photoMap["Groupe"] || 'images/group.jpg';
-
-      const popupContent = group.map(name => {
-        const info = latestLocations[name].info || '';
-        return `<strong>${name}</strong><br><em>${info}</em><hr>`;
-      }).join('');
 
       validateImage(rawGroupPhoto).then(validGroupPhoto => {
         const groupIcon = L.icon({
@@ -169,15 +165,36 @@ function loadDataFromArray(data, photoMap, year) {
           popupAnchor: [0, -25]
         });
 
-        const marker = L.marker([lat, lon], { icon: groupIcon })
-          .bindPopup(`
-            <strong>${ville}</strong><br><br>
-            ${popupContent}
-          `);
+        const groupMarker = L.marker([lat, lon], { icon: groupIcon });
+        groupMarker.addTo(map);
+        oms.addMarker(groupMarker);
+        markers.push(groupMarker);
 
-        marker.addTo(map);
-        oms.addMarker(marker);
-        markers.push(marker);
+        // 📍 Marqueurs individuels (déployés par Spiderfier)
+        group.forEach((name, index) => {
+          const info = latestLocations[name].info || '';
+          const rawPhotoUrl = photoMap[name] || 'images/default.jpg';
+
+          validateImage(rawPhotoUrl).then(validPhotoUrl => {
+            const individualIcon = L.icon({
+              iconUrl: validPhotoUrl,
+              iconSize: [50, 50],
+              iconAnchor: [25, 25],
+              popupAnchor: [0, -25]
+            });
+
+            const offset = 0.00001 * index;
+            const marker = L.marker([lat + offset, lon + offset], { icon: individualIcon })
+              .bindPopup(`
+                <strong>${name}</strong><br>
+                ${ville}<br>
+                <em>${info}</em>
+              `);
+
+            oms.addMarker(marker);
+            markers.push(marker);
+          });
+        });
       });
     }
   }
