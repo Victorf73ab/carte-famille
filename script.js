@@ -100,44 +100,40 @@ function loadDataFromArray(data, photoMap, year) {
   oms.clearMarkers();
 
   const latestLocations = {};
-  const personLines = {};
+  const personState = {};
 
-  // Regrouper toutes les lignes par personne
-  data.forEach(person => {
-    if (!person.name || isNaN(person.year)) return;
-    if (!personLines[person.name]) personLines[person.name] = [];
-    personLines[person.name].push(person);
-  });
+  // Trier toutes les lignes par année croissante
+  const sortedData = data
+    .filter(p => p.name && !isNaN(p.year) && p.year <= year)
+    .sort((a, b) => a.year - b.year);
 
-  // Pour chaque personne, déterminer la dernière ligne active
-  for (const name in personLines) {
-    const lines = personLines[name]
-      .filter(p => p.year <= year)
-      .sort((a, b) => a.year - b.year);
+  // Parcourir chaque ligne chronologiquement
+  sortedData.forEach(person => {
+    const name = person.name;
+    const info = person.info ? person.info.toLowerCase() : '';
+    const isStop = info.includes("stop") || info.includes("décès") || info.includes("divorce");
 
-    if (lines.length === 0) continue;
-
-    let isActive = true;
-    let lastValidLine = null;
-
-    for (const line of lines) {
-      const info = line.info ? line.info.toLowerCase() : '';
-      const isStop = info.includes("stop") || info.includes("décès") || info.includes("divorce");
-
-      if (isStop) {
-        isActive = false;
-      } else if (isActive) {
-        lastValidLine = line;
-      }
+    if (!personState[name]) {
+      personState[name] = { active: false, lastLine: null };
     }
 
-    if (lastValidLine) {
+    if (isStop) {
+      personState[name].active = false;
+    } else {
+      personState[name].active = true;
+      personState[name].lastLine = person;
+    }
+  });
+
+  for (const name in personState) {
+    const state = personState[name];
+    if (state.active && state.lastLine) {
       latestLocations[name] = {
-        lat: lastValidLine.lat,
-        lon: lastValidLine.lon,
-        ville: lastValidLine.ville,
-        info: lastValidLine.info,
-        year: lastValidLine.year
+        lat: state.lastLine.lat,
+        lon: state.lastLine.lon,
+        ville: state.lastLine.ville,
+        info: state.lastLine.info,
+        year: state.lastLine.year
       };
     }
   }
