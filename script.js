@@ -103,10 +103,16 @@ function loadDataFromArray(data, photoMap, year) {
 
   data.forEach(person => {
     const infoText = person.info ? person.info.toLowerCase() : '';
-    const isDeceased = infoText.includes("décès");
-    const isDivorced = infoText.includes("divorce");
+const isDeceased = infoText.includes("décès");
+const isDivorced = infoText.includes("divorce");
+const isStopped = infoText.includes("stop");
 
-    const endYear = (isDeceased || isDivorced) ? person.year + 1 : Infinity;
+let endYear = Infinity;
+if (isDeceased || isDivorced) {
+  endYear = person.year + 1;
+} else if (isStopped) {
+  endYear = person.year; // visible uniquement l’année indiquée
+}
 
     if (person.year <= year && year < endYear) {
       latestLocations[person.name] = {
