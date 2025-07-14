@@ -1,5 +1,5 @@
 // 🗺️ Initialisation de la carte
-const map = L.map('map').setView([46.8, 2.5], 6);
+const map = L.map('map').setView([53.0, 15.0], 4); // Vue centrée sur l’Europe, zoom dézoommé
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© OpenStreetMap contributors'
