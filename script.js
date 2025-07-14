@@ -1,10 +1,3 @@
-// 📸 Dictionnaire des photos associées aux noms
-const photoMap = {
-  "Victor Fromentin": "images/victorperso.jpg",
-  "Nicolas Fromentin": "images/nico.jpg",
-  "Anouk Fromentin": "images/default.jpg"
-};
-
 // 🗺️ Initialisation de la carte
 const map = L.map('map').setView([46.8, 2.5], 6);
 
@@ -24,10 +17,11 @@ const oms = new OverlappingMarkerSpiderfier(map, {
 const yearInput = document.getElementById('year');
 const yearLabel = document.getElementById('year-label');
 
-// 📄 URL de la Google Sheets publiée en CSV
-const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRZEa-I6uMMti1wpeSuNNqdXVN8BxR0QOhYKW9dbUEj88hM0xF5y-rXE5NikL3kipmOek5erQQxVuwI/pub?output=csv';
+// 📄 URLs des deux onglets Google Sheets
+const dataSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRZEa-I6uMMti1wpeSuNNqdXVN8BxR0QOhYKW9dbUEj88hM0xF5y-rXE5NikL3kipmOek5erQQxVuwI/pub?output=csv';
+const photoSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRZEa-I6uMMti1wpeSuNNqdXVN8BxR0QOhYKW9dbUEj88hM0xF5y-rXE5NikL3kipmOek5erQQxVuwI/pub?gid=1436940582&single=true&output=csv';
 
-// 🔍 Fonction pour parser le CSV
+// 🔍 Fonction pour parser un CSV en tableau d’objets
 function parseCSV(text) {
   const lines = text.trim().split('\n');
   const headers = lines[0].split(',');
@@ -35,7 +29,7 @@ function parseCSV(text) {
     const values = line.split(',');
     const obj = {};
     headers.forEach((h, i) => {
-      obj[h.trim()] = values[i].trim();
+      obj[h.trim()] = values[i] ? values[i].trim() : '';
     });
     obj.year = parseInt(obj.year);
     obj.lat = parseFloat(obj.lat);
@@ -44,35 +38,63 @@ function parseCSV(text) {
   });
 }
 
-// 📅 Chargement des données depuis Google Sheets
-fetch(sheetUrl)
-  .then(response => response.text())
-  .then(csv => {
-    const peopleData = parseCSV(csv);
-    const years = peopleData.map(p => p.year);
-    const minYear = Math.min(...years);
-    const maxYear = 2025;
-
-    yearInput.min = minYear;
-    yearInput.max = maxYear;
-    yearInput.step = 1;
-    yearInput.value = minYear;
-    yearLabel.textContent = minYear;
-
-    loadDataFromArray(peopleData, minYear);
-
-    yearInput.addEventListener('input', () => {
-      const selectedYear = parseInt(yearInput.value);
-      yearLabel.textContent = selectedYear;
-      loadDataFromArray(peopleData, selectedYear);
-    });
-  })
-  .catch(error => {
-    console.error("Erreur lors du chargement des données Google Sheets :", error);
+// 🔍 Fonction pour créer le dictionnaire des photos
+function loadPhotoMap(csvText) {
+  const lines = csvText.trim().split('\n');
+  const headers = lines[0].split(',');
+  const map = {};
+  lines.slice(1).forEach(line => {
+    const values = line.split(',');
+    const name = values[0].trim();
+    const photo = values[1] ? values[1].trim() : 'images/default.jpg';
+    map[name] = photo;
   });
+  return map;
+}
+
+// 🔧 Vérifie si une image est valide, sinon retourne l’image par défaut
+function validateImage(url, fallback = 'images/default.jpg') {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => resolve(url);
+    img.onerror = () => resolve(fallback);
+    img.src = url;
+  });
+}
+
+// 📦 Chargement des deux feuilles en parallèle
+Promise.all([
+  fetch(dataSheetUrl).then(r => r.text()),
+  fetch(photoSheetUrl).then(r => r.text())
+])
+.then(([csvData, csvPhotos]) => {
+  const peopleData = parseCSV(csvData);
+  const photoMap = loadPhotoMap(csvPhotos);
+
+  const years = peopleData.map(p => p.year).filter(y => !isNaN(y));
+  const minYear = Math.min(...years);
+  const maxYear = 2025;
+
+  yearInput.min = minYear;
+  yearInput.max = maxYear;
+  yearInput.step = 1;
+  yearInput.value = minYear;
+  yearLabel.textContent = minYear;
+
+  loadDataFromArray(peopleData, photoMap, minYear);
+
+  yearInput.addEventListener('input', () => {
+    const selectedYear = parseInt(yearInput.value);
+    yearLabel.textContent = selectedYear;
+    loadDataFromArray(peopleData, photoMap, selectedYear);
+  });
+})
+.catch(error => {
+  console.error("Erreur lors du chargement des données Google Sheets :", error);
+});
 
 // 📍 Fonction principale pour afficher les points
-function loadDataFromArray(data, year) {
+function loadDataFromArray(data, photoMap, year) {
   markers.forEach(marker => map.removeLayer(marker));
   markers = [];
   oms.clearMarkers();
@@ -104,25 +126,27 @@ function loadDataFromArray(data, year) {
 
     group.forEach((name) => {
       const { lat, lon, ville, info } = latestLocations[name];
-      const photoUrl = photoMap[name] || 'images/default.jpg';
+      const rawPhotoUrl = photoMap[name] || 'images/default.jpg';
 
-      const customIcon = L.icon({
-        iconUrl: photoUrl,
-        iconSize: [50, 50],
-        iconAnchor: [25, 25],
-        popupAnchor: [0, -25]
+      validateImage(rawPhotoUrl).then(validPhotoUrl => {
+        const customIcon = L.icon({
+          iconUrl: validPhotoUrl,
+          iconSize: [50, 50],
+          iconAnchor: [25, 25],
+          popupAnchor: [0, -25]
+        });
+
+        const marker = L.marker([lat, lon], { icon: customIcon })
+          .bindPopup(`
+            <strong>${name}</strong><br>
+            ${ville}<br>
+            <em>${info || ''}</em>
+          `);
+
+        marker.addTo(map);
+        oms.addMarker(marker);
+        markers.push(marker);
       });
-
-      const marker = L.marker([lat, lon], { icon: customIcon })
-        .bindPopup(`
-          <strong>${name}</strong><br>
-          ${ville}<br>
-          <em>${info || ''}</em>
-        `);
-
-      marker.addTo(map);
-      oms.addMarker(marker);
-      markers.push(marker);
     });
   }
 
