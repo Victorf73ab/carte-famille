@@ -114,7 +114,7 @@ if (isDeceased || isDivorced) {
   endYear = person.year; // visible uniquement l’année indiquée
 }
 
-    if (person.year <= year && year < endYear) {
+    if (person.year <= year && year <= endYear) {
       latestLocations[person.name] = {
         lat: person.lat,
         lon: person.lon,
