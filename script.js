@@ -120,31 +120,25 @@ function loadDataFromArray(data, photoMap, year) {
     let hasStopped = false;
 
     for (const line of lines) {
-     const info = line.info ? line.info.toLowerCase() : '';
- const isStop = info.includes("stop");
-const isFinal = info.includes("décès") || info.includes("divorce");
+      const info = line.info ? line.info.toLowerCase() : '';
+      const isStop = info.includes("stop");
+      const isFinal = info.includes("décès") || info.includes("divorce");
 
-if (isStop && line.year <= year) {
-  hasStopped = true;
-}
+      if (isStop && line.year <= year) {
+        hasStopped = true;
+      }
 
-if (isFinal) {
-  if (line.year === year) {
-    lastValidLine = line;
-  }
-  if (line.year < year) {
-    hasStopped = true;
-  }
-}
+      if (isFinal) {
+        if (line.year === year) lastValidLine = line;
+        if (line.year < year) hasStopped = true;
+      }
 
+      if (!hasStopped && !isFinal) {
+        lastValidLine = line;
+      }
+    }
 
-if (!hasStopped && !isFinal) {
-  lastValidLine = line;
-}
-
-}
-
-   if (lastValidLine && !hasStopped) {
+    if (lastValidLine && !hasStopped) {
       latestLocations[name] = {
         lat: lastValidLine.lat,
         lon: lastValidLine.lon,
@@ -240,4 +234,12 @@ if (!hasStopped && !isFinal) {
   oms.addListener('click', function(marker) {
     marker.openPopup();
   });
+
+  // 🧭 Ajustement automatique de la carte après ajout des marqueurs
+  setTimeout(() => {
+    if (markers.length > 0) {
+      const bounds = L.latLngBounds(markers.map(m => m.getLatLng()));
+      map.fitBounds(bounds, { padding: [50, 50] });
+    }
+  }, 600);
 }
