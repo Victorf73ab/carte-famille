@@ -120,16 +120,17 @@ function loadDataFromArray(data, photoMap, year) {
     let hasStopped = false;
 
     for (const line of lines) {
-      const info = line.info ? line.info.toLowerCase() : '';
-      const isStop = info.includes("stop") || info.includes("décès") || info.includes("divorce");
+  const info = line.info ? line.info.toLowerCase() : '';
+  const isStop = info.includes("stop") || info.includes("décès") || info.includes("divorce");
 
-      if (isStop) {
-        hasStopped = true;
-        break;
-      }
+  if (isStop) {
+    hasStopped = true;
+  }
 
-      lastValidLine = line;
-    }
+  if (!hasStopped) {
+    lastValidLine = line;
+  }
+}
 
     if (lastValidLine && !hasStopped) {
       latestLocations[name] = {
