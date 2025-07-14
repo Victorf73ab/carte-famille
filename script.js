@@ -132,8 +132,11 @@ if (isFinal) {
   if (line.year === year) {
     lastValidLine = line;
   }
-  hasStopped = true;
+  if (line.year < year) {
+    hasStopped = true;
+  }
 }
+
 
 if (!hasStopped && !isFinal) {
   lastValidLine = line;
