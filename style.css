@@ -50,3 +50,12 @@ h1, h2 {
   accent-color: #0077cc;
   cursor: pointer;
 }
+
+/* 👤 Images des personnes en cercle */
+.photo-personne {
+  border-radius: 50%;
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border: 2px solid white; /* optionnel : ajoute un contour */
+}
