@@ -51,11 +51,9 @@ h1, h2 {
   cursor: pointer;
 }
 
-/* 👤 Images des personnes en cercle */
-.photo-personne {
-  border-radius: 50%;
-  width: 150px;
-  height: 150px;
+/* images en cercle */
+.leaflet-marker-icon {
+  border-radius: 50% !important;
   object-fit: cover;
-  border: 2px solid white; /* optionnel : ajoute un contour */
+  border: 2px solid white;
 }
