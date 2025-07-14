@@ -24,11 +24,32 @@ const oms = new OverlappingMarkerSpiderfier(map, {
 const yearInput = document.getElementById('year');
 const yearLabel = document.getElementById('year-label');
 
-// 📅 Initialisation dynamique du slider
-fetch('data/famille.geojson')
-  .then(response => response.json())
-  .then(data => {
-    const years = data.features.map(f => parseInt(f.properties.year));
+// 📄 URL de la Google Sheets publiée en CSV
+const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRZEa-I6uMMti1wpeSuNNqdXVN8BxR0QOhYKW9dbUEj88hM0xF5y-rXE5NikL3kipmOek5erQQxVuwI/pub?output=csv';
+
+// 🔍 Fonction pour parser le CSV
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  const headers = lines[0].split(',');
+  return lines.slice(1).map(line => {
+    const values = line.split(',');
+    const obj = {};
+    headers.forEach((h, i) => {
+      obj[h.trim()] = values[i].trim();
+    });
+    obj.year = parseInt(obj.year);
+    obj.lat = parseFloat(obj.lat);
+    obj.lon = parseFloat(obj.lon);
+    return obj;
+  });
+}
+
+// 📅 Chargement des données depuis Google Sheets
+fetch(sheetUrl)
+  .then(response => response.text())
+  .then(csv => {
+    const peopleData = parseCSV(csv);
+    const years = peopleData.map(p => p.year);
     const minYear = Math.min(...years);
     const maxYear = 2025;
 
@@ -38,90 +59,74 @@ fetch('data/famille.geojson')
     yearInput.value = minYear;
     yearLabel.textContent = minYear;
 
-    loadData(minYear);
+    loadDataFromArray(peopleData, minYear);
 
     yearInput.addEventListener('input', () => {
       const selectedYear = parseInt(yearInput.value);
       yearLabel.textContent = selectedYear;
-      loadData(selectedYear);
+      loadDataFromArray(peopleData, selectedYear);
     });
   })
   .catch(error => {
-    console.error("Erreur lors de l'initialisation du slider :", error);
+    console.error("Erreur lors du chargement des données Google Sheets :", error);
   });
 
 // 📍 Fonction principale pour afficher les points
-function loadData(year) {
-  fetch('data/famille.geojson')
-    .then(response => response.json())
-    .then(data => {
-      // Supprimer les anciens marqueurs
-      markers.forEach(marker => map.removeLayer(marker));
-      markers = [];
-      oms.clearMarkers();
+function loadDataFromArray(data, year) {
+  markers.forEach(marker => map.removeLayer(marker));
+  markers = [];
+  oms.clearMarkers();
 
-      const latestLocations = {};
+  const latestLocations = {};
 
-      // Récupérer la dernière position connue pour chaque personne
-      data.features.forEach(feature => {
-        const featureYear = parseInt(feature.properties.year);
-        const name = feature.properties.name;
+  data.forEach(person => {
+    if (person.year <= year) {
+      latestLocations[person.name] = {
+        lat: person.lat,
+        lon: person.lon,
+        ville: person.ville,
+        info: person.info,
+        year: person.year
+      };
+    }
+  });
 
-        if (featureYear <= year) {
-          const [lon, lat] = feature.geometry.coordinates;
-          latestLocations[name] = {
-            lat,
-            lon,
-            ville: feature.properties.ville,
-            info: feature.properties.info,
-            year: featureYear
-          };
-        }
+  const locationGroups = {};
+  for (const name in latestLocations) {
+    const { lat, lon } = latestLocations[name];
+    const key = `${lat.toFixed(5)}_${lon.toFixed(5)}`;
+    if (!locationGroups[key]) locationGroups[key] = [];
+    locationGroups[key].push(name);
+  }
+
+  for (const key in locationGroups) {
+    const group = locationGroups[key];
+
+    group.forEach((name) => {
+      const { lat, lon, ville, info } = latestLocations[name];
+      const photoUrl = photoMap[name] || 'images/default.jpg';
+
+      const customIcon = L.icon({
+        iconUrl: photoUrl,
+        iconSize: [50, 50],
+        iconAnchor: [25, 25],
+        popupAnchor: [0, -25]
       });
 
-      // Regrouper les personnes par position
-      const locationGroups = {};
-      for (const name in latestLocations) {
-        const { lat, lon } = latestLocations[name];
-        const key = `${lat.toFixed(5)}_${lon.toFixed(5)}`;
-        if (!locationGroups[key]) locationGroups[key] = [];
-        locationGroups[key].push(name);
-      }
+      const marker = L.marker([lat, lon], { icon: customIcon })
+        .bindPopup(`
+          <strong>${name}</strong><br>
+          ${ville}<br>
+          <em>${info || ''}</em>
+        `);
 
-      // Afficher les marqueurs avec spiderfier
-      for (const key in locationGroups) {
-        const group = locationGroups[key];
-
-        group.forEach((name) => {
-          const { lat, lon, ville, info } = latestLocations[name];
-          const photoUrl = photoMap[name] || 'images/default.jpg';
-
-          const customIcon = L.icon({
-            iconUrl: photoUrl,
-            iconSize: [50, 50],
-            iconAnchor: [25, 25],
-            popupAnchor: [0, -25]
-          });
-
-          const marker = L.marker([lat, lon], { icon: customIcon })
-            .bindPopup(`
-              <strong>${name}</strong><br>
-              ${ville}<br>
-              <em>${info || ''}</em>
-            `);
-
-          marker.addTo(map);
-          oms.addMarker(marker);
-          markers.push(marker);
-        });
-      }
-
-      // Optionnel : ouvrir le popup au clic via OMS
-      oms.addListener('click', function(marker) {
-        marker.openPopup();
-      });
-    })
-    .catch(error => {
-      console.error("Erreur lors du chargement du fichier GeoJSON :", error);
+      marker.addTo(map);
+      oms.addMarker(marker);
+      markers.push(marker);
     });
+  }
+
+  oms.addListener('click', function(marker) {
+    marker.openPopup();
+  });
 }
