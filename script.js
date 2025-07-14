@@ -121,33 +121,64 @@ function loadDataFromArray(data, photoMap, year) {
     locationGroups[key].push(name);
   }
 
-  for (const key in locationGroups) {
-    const group = locationGroups[key];
+for (const key in locationGroups) {
+  const group = locationGroups[key];
 
-    group.forEach((name) => {
-      const { lat, lon, ville, info } = latestLocations[name];
-      const rawPhotoUrl = photoMap[name] || 'images/default.jpg';
+  if (group.length === 1) {
+    const name = group[0];
+    const { lat, lon, ville, info } = latestLocations[name];
+    const rawPhotoUrl = photoMap[name] || photoMap["Groupe"] || 'images/default.jpg';
 
-      validateImage(rawPhotoUrl).then(validPhotoUrl => {
-        const customIcon = L.icon({
-          iconUrl: validPhotoUrl,
-          iconSize: [50, 50],
-          iconAnchor: [25, 25],
-          popupAnchor: [0, -25]
-        });
-
-        const marker = L.marker([lat, lon], { icon: customIcon })
-          .bindPopup(`
-            <strong>${name}</strong><br>
-            ${ville}<br>
-            <em>${info || ''}</em>
-          `);
-
-        marker.addTo(map);
-        oms.addMarker(marker);
-        markers.push(marker);
+    validateImage(rawPhotoUrl).then(validPhotoUrl => {
+      const customIcon = L.icon({
+        iconUrl: validPhotoUrl,
+        iconSize: [50, 50],
+        iconAnchor: [25, 25],
+        popupAnchor: [0, -25]
       });
+
+      const marker = L.marker([lat, lon], { icon: customIcon })
+        .bindPopup(`
+          <strong>${name}</strong><br>
+          ${ville}<br>
+          <em>${info || ''}</em>
+        `);
+
+      marker.addTo(map);
+      oms.addMarker(marker);
+      markers.push(marker);
     });
+  } else {
+    // 📸 Groupe de personnes au même endroit
+    const { lat, lon } = latestLocations[group[0]];
+    const ville = latestLocations[group[0]].ville;
+    const rawGroupPhoto = photoMap["Groupe"] || 'images/group.jpg';
+
+    const popupContent = group.map(name => {
+      const info = latestLocations[name].info || '';
+      return `<strong>${name}</strong><br><em>${info}</em><hr>`;
+    }).join('');
+
+    validateImage(rawGroupPhoto).then(validGroupPhoto => {
+      const groupIcon = L.icon({
+        iconUrl: validGroupPhoto,
+        iconSize: [50, 50],
+        iconAnchor: [25, 25],
+        popupAnchor: [0, -25]
+      });
+
+      const marker = L.marker([lat, lon], { icon: groupIcon })
+        .bindPopup(`
+          <strong>${ville}</strong><br><br>
+          ${popupContent}
+        `);
+
+      marker.addTo(map);
+      oms.addMarker(marker);
+      markers.push(marker);
+    });
+  }
+});
   }
 
   oms.addListener('click', function(marker) {
