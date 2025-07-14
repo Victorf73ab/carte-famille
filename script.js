@@ -220,7 +220,7 @@ if (!hasStopped && !isFinal) {
               popupAnchor: [0, -25]
             });
 
-            const offset = 0.00001 * index;
+            const offset = 0.00005 * index;
             const marker = L.marker([lat + offset, lon + offset], { icon: individualIcon })
               .bindPopup(`
                 <strong>${name}</strong><br>
