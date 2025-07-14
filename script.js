@@ -102,10 +102,13 @@ function loadDataFromArray(data, photoMap, year) {
   const latestLocations = {};
 
   data.forEach(person => {
-    const isDeceased = person.info && person.info.toLowerCase().includes("décès");
-    const deathYear = isDeceased ? person.year + 1 : Infinity;
+    const infoText = person.info ? person.info.toLowerCase() : '';
+    const isDeceased = infoText.includes("décès");
+    const isDivorced = infoText.includes("divorce");
 
-    if (person.year <= year && year < deathYear) {
+    const endYear = (isDeceased || isDivorced) ? person.year + 1 : Infinity;
+
+    if (person.year <= year && year < endYear) {
       latestLocations[person.name] = {
         lat: person.lat,
         lon: person.lon,
@@ -154,7 +157,6 @@ function loadDataFromArray(data, photoMap, year) {
         markers.push(marker);
       });
     } else {
-      // 📸 Marqueur principal avec image de groupe
       const rawGroupPhoto = photoMap["Groupe"] || 'images/group.jpg';
 
       validateImage(rawGroupPhoto).then(validGroupPhoto => {
@@ -170,7 +172,6 @@ function loadDataFromArray(data, photoMap, year) {
         oms.addMarker(groupMarker);
         markers.push(groupMarker);
 
-        // 📍 Marqueurs individuels (déployés par Spiderfier)
         group.forEach((name, index) => {
           const info = latestLocations[name].info || '';
           const rawPhotoUrl = photoMap[name] || 'images/default.jpg';
