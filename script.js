@@ -114,6 +114,26 @@ function loadDataFromArray(data, photoMap, year) {
         lon: person.lon,
         ville: person.ville,
         info: person.info,
+        loadDataFromArray(data, photoMap, year) {
+  markers.forEach(marker => map.removeLayer(marker));
+  markers = [];
+  oms.clearMarkers();
+
+  const latestLocations = {};
+
+  data.forEach(person => {
+    const infoText = person.info ? person.info.toLowerCase() : '';
+    const isDeceased = infoText.includes("décès");
+    const isDivorced = infoText.includes("divorce");
+
+    const endYear = (isDeceased || isDivorced) ? person.year + 1 : Infinity;
+
+    if (person.year <= year && year < endYear) {
+      latestLocations[person.name] = {
+        lat: person.lat,
+        lon: person.lon,
+        ville: person.ville,
+        info: person.info,
         year: person.year
       };
     }
@@ -192,6 +212,7 @@ function loadDataFromArray(data, photoMap, year) {
                 <em>${info}</em>
               `);
 
+            marker.addTo(map); // 👈 rend le marqueur visible
             oms.addMarker(marker);
             markers.push(marker);
           });
