@@ -100,27 +100,47 @@ function loadDataFromArray(data, photoMap, year) {
   oms.clearMarkers();
 
   const latestLocations = {};
+  const personLines = {};
 
-data.forEach(person => {
-  const infoText = person.info ? person.info.toLowerCase() : '';
-  const isDeceased = infoText.includes("décès");
-  const isDivorced = infoText.includes("divorce");
-  const isStopped = infoText.includes("stop");
+  // Regrouper toutes les lignes par personne
+  data.forEach(person => {
+    if (!person.name || isNaN(person.year)) return;
+    if (!personLines[person.name]) personLines[person.name] = [];
+    personLines[person.name].push(person);
+  });
 
-  const isLimited = isDeceased || isDivorced || isStopped;
-  const isVisible = isLimited ? year === person.year : person.year <= year;
+  // Pour chaque personne, déterminer la dernière ligne active
+  for (const name in personLines) {
+    const lines = personLines[name]
+      .filter(p => p.year <= year)
+      .sort((a, b) => a.year - b.year);
 
-  if (isVisible) {
-    latestLocations[person.name] = {
-      lat: person.lat,
-      lon: person.lon,
-      ville: person.ville,
-      info: person.info,
-      year: person.year
-    };
+    if (lines.length === 0) continue;
+
+    let isActive = true;
+    let lastValidLine = null;
+
+    for (const line of lines) {
+      const info = line.info ? line.info.toLowerCase() : '';
+      const isStop = info.includes("stop") || info.includes("décès") || info.includes("divorce");
+
+      if (isStop) {
+        isActive = false;
+      } else if (isActive) {
+        lastValidLine = line;
+      }
+    }
+
+    if (lastValidLine) {
+      latestLocations[name] = {
+        lat: lastValidLine.lat,
+        lon: lastValidLine.lon,
+        ville: lastValidLine.ville,
+        info: lastValidLine.info,
+        year: lastValidLine.year
+      };
+    }
   }
-});
-
 
   const locationGroups = {};
   for (const name in latestLocations) {
