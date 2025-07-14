@@ -101,18 +101,7 @@ function loadDataFromArray(data, photoMap, year) {
 
   const latestLocations = {};
 
-const personHistory = {};
-
 data.forEach(person => {
-  if (!person.name || isNaN(person.year)) return;
-
-  if (!personHistory[person.name] || person.year > personHistory[person.name].year) {
-    personHistory[person.name] = person;
-  }
-});
-
-for (const name in personHistory) {
-  const person = personHistory[name];
   const infoText = person.info ? person.info.toLowerCase() : '';
   const isDeceased = infoText.includes("décès");
   const isDivorced = infoText.includes("divorce");
@@ -122,7 +111,7 @@ for (const name in personHistory) {
   const isVisible = isLimited ? year === person.year : person.year <= year;
 
   if (isVisible) {
-    latestLocations[name] = {
+    latestLocations[person.name] = {
       lat: person.lat,
       lon: person.lon,
       ville: person.ville,
@@ -130,7 +119,7 @@ for (const name in personHistory) {
       year: person.year
     };
   }
-}
+});
 
 
   const locationGroups = {};
