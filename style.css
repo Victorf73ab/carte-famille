@@ -57,3 +57,9 @@ h1, h2 {
   object-fit: cover;
   border: 2px solid white;
 }
+
+.leaflet-marker-icon:hover {
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+  transform: scale(1.1);
+  transition: 0.3s ease;
+}
