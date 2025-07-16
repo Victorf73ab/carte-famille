@@ -37,10 +37,15 @@ h1, h2 {
 
 /* 🏷️ Label de l’année au-dessus du slider */
 #year-label {
-  font-size: 20px;
+  background-color: rgba(255, 255, 255, 0.9); /* fond clair semi-transparent */
+  color: #333;                                /* texte sombre lisible */
+  padding: 8px 14px;
+  border-radius: 12px;
   font-weight: bold;
-  color: white;
-  margin-bottom: 8px;
+  font-size: 18px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.3);
+  display: inline-block;
+  border: 2px solid #ccc;
 }
 
 /* 🎯 Slider stylisé */
