@@ -63,6 +63,12 @@
   </style>
 </head>
 <body>
+   <!-- 👤 Filtre de personnes -->
+  <div id="person-selector">
+    <label for="person-select">Choisir une personne :</label>
+    <select id="person-select" multiple></select>
+    <button id="hide-all">Tout masquer</button>
+  </div>
   <!-- 🗺️ Carte -->
   <div id="map"></div>
 
@@ -72,14 +78,8 @@
     <input type="range" id="year" step="1">
   </div>
 
-  <!-- 👤 Filtre de personnes -->
-  <div id="person-selector">
-    <label for="person-select">Choisir une personne :</label>
-    <select id="person-select" multiple></select>
-    <button id="hide-all">Tout masquer</button>
-  </div>
 
-  <!-- 📦 Scripts --!!>
+  <!-- 📦 Scripts -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/OverlappingMarkerSpiderfier-Leaflet/0.2.6/oms.min.js"></script>
   <script src="script.js"></script>
