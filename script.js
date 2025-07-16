@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const personHeader        = document.getElementById('person-header');
   const personSelectorDiv   = document.getElementById('person-selector');
   const personListContainer = document.getElementById('person-list-container');
-  // Masqué par défaut
   personListContainer.style.display = 'none';
   personHeader.addEventListener('click', () => {
     const isOpen = personSelectorDiv.classList.toggle('open');
@@ -17,32 +16,32 @@ document.addEventListener('DOMContentLoaded', () => {
   }).addTo(map);
 
   let markers = [];
-
-  // 🕷️ OverlappingMarkerSpiderfier
   const oms = new OverlappingMarkerSpiderfier(map, {
     keepSpiderfied: true,
     nearbyDistance: 20
   });
 
-  // 🎚️ Récupération des éléments du DOM
+  // 🎚️ Récupération des éléments DOM
   const yearInput  = document.getElementById('year');
   const yearLabel  = document.getElementById('year-label');
   const personList = document.getElementById('person-list');
   const hideAllBtn = document.getElementById('hide-all');
 
-  // 📄 URLs des onglets Google Sheets (format CSV)
+  // 📄 URLs des Google Sheets (format CSV)
   const dataSheetUrl  = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRZEa-I6uMMti1wpeSuNNqdXVN8BxR0QOhYKW9dbUEj88hM0xF5y-rXE5NikL3kipmOek5erQQxVuwI/pub?output=csv';
   const photoSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRZEa-I6uMMti1wpeSuNNqdXVN8BxR0QOhYKW9dbUEj88hM0xF5y-rXE5NikL3kipmOek5erQQxVuwI/pub?gid=1436940582&single=true&output=csv';
+  const groupSheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRZEa-I6uMMti1wpeSuNNqdXVN8BxR0QOhYKW9dbUEj88hM0xF5y-rXE5NikL3kipmOek5erQQxVuwI/pub?gid=1406949721&single=true&output=csv';
 
   // 🌐 Stockage global
   let peopleData = [];
   let photoMap    = {};
+  let groupMap    = {};
 
   // 🔍 Parse un CSV en tableau d’objets
   function parseCSV(text) {
     const lines   = text.trim().split('\n');
-    const headers = lines[0].split(',');
-    return lines.slice(1).map(line => {
+    const headers = lines.shift().split(',');
+    return lines.map(line => {
       const values = line.split(',');
       const obj    = {};
       headers.forEach((h, i) => {
@@ -66,6 +65,22 @@ document.addEventListener('DOMContentLoaded', () => {
     return map;
   }
 
+  // 🔍 Crée le dictionnaire des groupes
+  // Chaque ligne : Groupe,Membres (séparés par ;)
+  function loadGroupMap(csvText) {
+    const lines = csvText.trim().split('\n').slice(1);
+    const map   = {};
+    lines.forEach(line => {
+      const [group, members] = line.split(',').map(s => s.trim());
+      if (!group) return;
+      map[group] = members
+        .split(';')
+        .map(n => n.trim())
+        .filter(n => n);
+    });
+    return map;
+  }
+
   // 🔧 Vérifie si une URL d’image est valide, fallback sinon
   function validateImage(url, fallback = 'images/default.jpg') {
     if (!url || url === 'undefined') return Promise.resolve(fallback);
@@ -77,32 +92,30 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 📦 Chargement des données
+  // 📦 Chargement parallèle des trois feuilles CSV
   Promise.all([
     fetch(dataSheetUrl).then(r => r.text()),
-    fetch(photoSheetUrl).then(r => r.text())
+    fetch(photoSheetUrl).then(r => r.text()),
+    fetch(groupSheetUrl).then(r => r.text())
   ])
-  .then(([csvData, csvPhotos]) => {
+  .then(([csvData, csvPhotos, csvGroups]) => {
     peopleData = parseCSV(csvData);
     photoMap   = loadPhotoMap(csvPhotos);
+    groupMap   = loadGroupMap(csvGroups);
 
-    // 📅 Configuration du slider
-    const years   = peopleData.map(p => p.year).filter(y => !isNaN(y));
-    const minYear = Math.min(...years);
-    const maxYear = Math.max(...years, 2025);
-
-    yearInput.min   = minYear;
-    yearInput.max   = maxYear;
+    // 📅 Configuration du slider (garde-fou si vide)
+    const years = peopleData.map(p => p.year).filter(y => !isNaN(y));
+    const today = new Date().getFullYear();
+    const minY  = years.length ? Math.min(...years) : today;
+    const maxY  = years.length ? Math.max(...years) : today;
+    yearInput.min   = minY;
+    yearInput.max   = maxY;
     yearInput.step  = 1;
-    yearInput.value = minYear;
-    yearLabel.textContent = minYear;
+    yearInput.value = minY;
+    yearLabel.textContent = minY;
 
-    // 👥 Génération des cases à cocher pour chaque personne
-    const personNames = [...new Set(peopleData.map(p => p.name))]
-      .filter(n => n)
-      .sort((a, b) => a.localeCompare(b, 'fr'));
-
-    personNames.forEach(name => {
+    // 👥 Génération des cases à cocher pour chaque groupe
+    Object.keys(groupMap).sort().forEach(groupName => {
       const label = document.createElement('label');
       label.style.display      = 'block';
       label.style.marginBottom = '4px';
@@ -110,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const checkbox = document.createElement('input');
       checkbox.type    = 'checkbox';
-      checkbox.value   = name;
+      checkbox.value   = groupName;
       checkbox.checked = true;
       checkbox.style.marginRight = '6px';
 
@@ -119,18 +132,8 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       label.appendChild(checkbox);
-      label.appendChild(document.createTextNode(name));
+      label.appendChild(document.createTextNode(groupName));
       personList.appendChild(label);
-    });
-
-    // Affichage initial
-    loadDataFromArray(minYear);
-
-    // ⏳ Événement du slider
-    yearInput.addEventListener('input', () => {
-      const y = parseInt(yearInput.value, 10);
-      yearLabel.textContent = y;
-      loadDataFromArray(y);
     });
 
     // 🛑 Bouton "Tout masquer"
@@ -140,25 +143,39 @@ document.addEventListener('DOMContentLoaded', () => {
         .forEach(cb => cb.checked = false);
       loadDataFromArray(parseInt(yearInput.value, 10));
     });
+
+    // ⏳ Événement du slider
+    yearInput.addEventListener('input', () => {
+      const y = parseInt(yearInput.value, 10);
+      yearLabel.textContent = y;
+      loadDataFromArray(y);
+    });
+
+    // Affichage initial
+    loadDataFromArray(minY);
   })
   .catch(err => console.error('Erreur chargement Google Sheets :', err));
 
   // 📍 Fonction principale : afficher les marqueurs selon filtres
   function loadDataFromArray(year) {
-    // Nettoyage
+    // nettoyage des anciens marqueurs
     markers.forEach(m => map.removeLayer(m));
     markers = [];
     oms.clearMarkers();
 
-    // Récupération des noms cochés
-    const selectedNames = Array.from(
+    // 1) récupération des groupes cochés
+    const selectedGroups = Array.from(
       document.querySelectorAll('#person-list input[type="checkbox"]:checked')
     ).map(cb => cb.value);
+    if (selectedGroups.length === 0) return;
 
-    // Si aucune personne cochée, on stoppe
+    // 2) aplatissement en liste de noms uniques
+    const selectedNames = [...new Set(
+      selectedGroups.flatMap(g => groupMap[g] || [])
+    )];
     if (selectedNames.length === 0) return;
 
-    // Regrouper les lignes par personne
+    // 3) regroupement des données par personne
     const personLines = {};
     peopleData.forEach(person => {
       if (!person.name || isNaN(person.year)) return;
@@ -166,19 +183,17 @@ document.addEventListener('DOMContentLoaded', () => {
       (personLines[person.name] = personLines[person.name] || []).push(person);
     });
 
-    // Calculer la dernière position valide par personne
+    // 4) calcul de la dernière position valide par personne
     const latestLocations = {};
-    Object.keys(personLines).forEach(name => {
-      const lines = personLines[name]
+    Object.entries(personLines).forEach(([name, lines]) => {
+      const filt = lines
         .filter(p => p.year <= year)
         .sort((a, b) => a.year - b.year);
-      if (!lines.length) return;
-
       let last = null, stopped = false;
-      lines.forEach(line => {
+      filt.forEach(line => {
         const info    = (line.info || '').toLowerCase();
         const isStop  = info.includes('stop');
-        const isFinal = info.includes('décès') || info.includes('divorce');
+        const isFinal = /décès|divorce/.test(info);
         if (isStop) stopped = true;
         if (!stopped && !isFinal) last = line;
         if (isFinal) {
@@ -186,41 +201,33 @@ document.addEventListener('DOMContentLoaded', () => {
           if (line.year < year) stopped = true;
         }
       });
-
-      if (last && !stopped) {
-        latestLocations[name] = last;
-      }
+      if (last && !stopped) latestLocations[name] = last;
     });
 
-    // Grouper par coordonnées pour éviter le chevauchement
+    // 5) groupement par coordonnées pour éviter chevauchement
     const locationGroups = {};
     Object.entries(latestLocations).forEach(([name, loc]) => {
       const key = `${loc.lat.toFixed(5)}_${loc.lon.toFixed(5)}`;
       (locationGroups[key] = locationGroups[key] || []).push(name);
     });
 
-    // Création et ajout des marqueurs
+    // 6) création et ajout des marqueurs
     Object.values(locationGroups).forEach(group => {
-      const loc   = latestLocations[group[0]];
-      const ville = loc.ville;
-
+      const { lat, lon, ville, info } = latestLocations[group[0]];
       if (group.length === 1) {
-        // Marqueur individuel
-        const name = group[0];
-        validateImage(photoMap[name]).then(url => {
+        const n = group[0];
+        validateImage(photoMap[n]).then(url => {
           const icon = L.icon({
             iconUrl:    url,
             iconSize:   [50, 50],
             iconAnchor: [25, 25],
             popupAnchor:[0, -25]
           });
-          const m = L.marker([loc.lat, loc.lon], { icon })
-            .bindPopup(`<strong>${name}</strong><br>${ville}<br><em>${loc.info}</em>`);
+          const m = L.marker([lat, lon], { icon })
+            .bindPopup(`<strong>${n}</strong><br>${ville}<br><em>${info}</em>`);
           m.addTo(map); oms.addMarker(m); markers.push(m);
         });
-
       } else {
-        // Plusieurs personnes au même endroit
         validateImage('images/group.jpg').then(url => {
           const icon = L.icon({
             iconUrl:    url,
@@ -228,11 +235,11 @@ document.addEventListener('DOMContentLoaded', () => {
             iconAnchor: [25, 25],
             popupAnchor:[0, -25]
           });
-          const groupM = L.marker([loc.lat, loc.lon], { icon });
-          groupM.addTo(map); oms.addMarker(groupM); markers.push(groupM);
+          const gm = L.marker([lat, lon], { icon });
+          gm.addTo(map); oms.addMarker(gm); markers.push(gm);
 
-          group.forEach((name, i) => {
-            validateImage(photoMap[name]).then(url2 => {
+          group.forEach((n, i) => {
+            validateImage(photoMap[n]).then(url2 => {
               const icon2 = L.icon({
                 iconUrl:    url2,
                 iconSize:   [50, 50],
@@ -240,8 +247,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 popupAnchor:[0, -25]
               });
               const offset = 0.00005 * i;
-              const m2     = L.marker([loc.lat + offset, loc.lon + offset], { icon: icon2 })
-                .bindPopup(`<strong>${name}</strong><br>${ville}<br><em>${latestLocations[name].info}</em>`);
+              const m2     = L.marker([lat + offset, lon + offset], { icon: icon2 })
+                .bindPopup(`<strong>${n}</strong><br>${ville}<br><em>${latestLocations[n].info}</em>`);
               m2.addTo(map); oms.addMarker(m2); markers.push(m2);
             });
           });
@@ -249,7 +256,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Permettre l’ouverture des popups via le spiderfier
+    // ouverture des popups via Spiderfier
     oms.addListener('click', marker => marker.openPopup());
   }
 });
