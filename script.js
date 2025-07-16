@@ -211,7 +211,7 @@ function loadDataFromArray(year) {
       const name = group[0];
       validateImage(photoMap[name]).then(url => {
         const icon = L.icon({
-          iconUrl,
+          iconUrl: url,
           iconSize: [50, 50],
           iconAnchor: [25, 25],
           popupAnchor: [0, -25]
