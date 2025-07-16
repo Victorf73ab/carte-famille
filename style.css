@@ -51,7 +51,7 @@ h1, h2 {
   cursor: pointer;
 }
 
-/* 👤 Menu déroulant en haut à droite, compact */
+/* 👤 Menu des personnes en haut à droite, compact */
 #person-selector {
   position: absolute;
   top: 10px;
@@ -62,7 +62,7 @@ h1, h2 {
   border-radius: 6px;
   font-family: Arial, sans-serif;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
-  max-width: 220px;
+  max-width: 240px;
 }
 
 /* 📋 Label du menu */
@@ -74,21 +74,24 @@ h1, h2 {
   color: #333;
 }
 
-/* 🔽 Sélecteur compact avec scroll */
-#person-select {
-  width: 100%;
-  height: auto;
-  max-height: 120px;
-  overflow-y: auto;
+/* 📋 Liste des personnes à cocher */
+#person-list label {
+  display: block;
   font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: #fff;
+  color: #333;
+  margin-bottom: 5px;
+  cursor: pointer;
+}
+
+#person-list input[type="checkbox"] {
+  margin-right: 6px;
+  transform: scale(1.1);
+  vertical-align: middle;
 }
 
 /* 🛑 Bouton "Tout masquer" */
 #hide-all {
-  margin-top: 8px;
+  margin-top: 10px;
   width: 100%;
   padding: 6px 12px;
   font-size: 14px;
