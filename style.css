@@ -51,19 +51,21 @@ h1, h2 {
   cursor: pointer;
 }
 
-/* 👤 Menu déroulant en haut à gauche */
+/* 👤 Menu déroulant en haut à droite, compact */
 #person-selector {
   position: absolute;
-  top: 20px;
-  right: 20px; /* 👉 On place à droite */
+  top: 10px;
+  right: 10px;
   z-index: 1100;
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(255, 255, 255, 0.95);
   padding: 10px;
   border-radius: 6px;
   font-family: Arial, sans-serif;
-  box-shadow: 0 0 8px rgba(0,0,0,0.2);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+  max-width: 220px;
 }
 
+/* 📋 Label du menu */
 #person-selector label {
   display: block;
   margin-bottom: 6px;
@@ -72,9 +74,12 @@ h1, h2 {
   color: #333;
 }
 
+/* 🔽 Sélecteur compact avec scroll */
 #person-select {
-  width: 200px;
-  height: 150px;
+  width: 100%;
+  height: auto;
+  max-height: 120px;
+  overflow-y: auto;
   font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -83,7 +88,8 @@ h1, h2 {
 
 /* 🛑 Bouton "Tout masquer" */
 #hide-all {
-  margin-top: 10px;
+  margin-top: 8px;
+  width: 100%;
   padding: 6px 12px;
   font-size: 14px;
   background-color: #cc0000;
