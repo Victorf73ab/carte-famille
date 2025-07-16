@@ -55,7 +55,7 @@ h1, h2 {
 #person-selector {
   position: absolute;
   top: 20px;
-  left: 20px;
+  right: 20px;
   z-index: 1100;
   background-color: rgba(255, 255, 255, 0.92);
   padding: 12px;
