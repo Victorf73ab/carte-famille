@@ -51,7 +51,7 @@ h1, h2 {
   cursor: pointer;
 }
 
-/* 👤 Menu des personnes en haut à droite, compact */
+/* 👤 Menu des personnes en haut à droite, dépliable */
 #person-selector {
   position: absolute;
   top: 10px;
@@ -65,16 +65,34 @@ h1, h2 {
   max-width: 240px;
 }
 
-/* 📋 Label du menu */
-#person-selector label {
-  display: block;
-  margin-bottom: 6px;
+/* 🧭 Titre cliquable du menu */
+#person-header {
   font-weight: bold;
   font-size: 15px;
   color: #333;
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #ccc;
+  cursor: pointer;
+}
+
+/* 🔽 Icône flèche animée */
+#toggle-arrow {
+  float: right;
+  transition: transform 0.3s ease;
+}
+
+/* 🔼 Rotation de la flèche si le menu est ouvert */
+#person-selector.open #toggle-arrow {
+  transform: rotate(180deg);
 }
 
 /* 📋 Liste des personnes à cocher */
+#person-list-container {
+  display: none;
+  margin-top: 10px;
+}
+
 #person-list label {
   display: block;
   font-size: 14px;
@@ -119,3 +137,4 @@ h1, h2 {
   transform: scale(1.1);
   transition: 0.3s ease;
 }
+
