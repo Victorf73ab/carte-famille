@@ -13,10 +13,10 @@ const oms = new OverlappingMarkerSpiderfier(map, {
 });
 
 // 🎚️ Récupération des éléments du DOM
-const yearInput     = document.getElementById('year');
-const yearLabel     = document.getElementById('year-label');
-const selectElement = document.getElementById('person-select');
-const hideAllBtn    = document.getElementById('hide-all');
+const yearInput  = document.getElementById('year');
+const yearLabel  = document.getElementById('year-label');
+const personList = document.getElementById('person-list');
+const hideAllBtn = document.getElementById('hide-all');
 
 // 📄 URLs des onglets Google Sheets (format CSV)
 const dataSheetUrl  = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRZEa-I6uMMti1wpeSuNNqdXVN8BxR0QOhYKW9dbUEj88hM0xF5y-rXE5NikL3kipmOek5erQQxVuwI/pub?output=csv';
@@ -100,30 +100,42 @@ Promise.all([
   yearInput.value = minYear;
   yearLabel.textContent = minYear;
 
-  // 👥 Remplissage du menu déroulant avec les noms de groupes
+  // 👥 Génération des cases à cocher pour chaque groupe
   Object.keys(groupMap).forEach(groupName => {
-    const option = document.createElement('option');
-    option.value       = groupName;
-    option.textContent = groupName;
-    selectElement.appendChild(option);
+    const label    = document.createElement('label');
+    label.style.display     = 'block';
+    label.style.marginBottom = '4px';
+
+    const checkbox = document.createElement('input');
+    checkbox.type    = 'checkbox';
+    checkbox.value   = groupName;
+    checkbox.checked = true;
+    checkbox.style.marginRight = '6px';
+
+    // Au changement, on recharge la carte
+    checkbox.addEventListener('change', () => {
+      loadDataFromArray(parseInt(yearInput.value, 10));
+    });
+
+    label.appendChild(checkbox);
+    label.appendChild(document.createTextNode(' ' + groupName));
+    personList.appendChild(label);
   });
 
   // Affichage initial de la carte
   loadDataFromArray(minYear);
 
-  // ⏳ Événements utilisateur
+  // ⏳ Événement du slider
   yearInput.addEventListener('input', () => {
     const y = parseInt(yearInput.value, 10);
     yearLabel.textContent = y;
     loadDataFromArray(y);
   });
 
-  selectElement.addEventListener('change', () => {
-    loadDataFromArray(parseInt(yearInput.value, 10));
-  });
-
+  // 🛑 Bouton "Tout masquer"
   hideAllBtn.addEventListener('click', () => {
-    Array.from(selectElement.options).forEach(opt => opt.selected = false);
+    Array.from(personList.querySelectorAll('input[type="checkbox"]'))
+      .forEach(cb => cb.checked = false);
     loadDataFromArray(parseInt(yearInput.value, 10));
   });
 })
@@ -136,8 +148,10 @@ function loadDataFromArray(year) {
   markers = [];
   oms.clearMarkers();
 
-  // Récupération des groupes sélectionnés
-  const selectedGroups = Array.from(selectElement.selectedOptions).map(o => o.value);
+  // Récupération des groupes cochés
+  const selectedGroups = Array.from(
+    document.querySelectorAll('#person-list input[type="checkbox"]:checked')
+  ).map(cb => cb.value);
 
   // Conversion en liste de noms
   let selectedNames = [];
@@ -196,7 +210,12 @@ function loadDataFromArray(year) {
       // Marqueur individuel
       const name = group[0];
       validateImage(photoMap[name]).then(url => {
-        const icon = L.icon({ iconUrl: url, iconSize: [50,50], iconAnchor: [25,25], popupAnchor: [0,-25] });
+        const icon = L.icon({
+          iconUrl,
+          iconSize: [50, 50],
+          iconAnchor: [25, 25],
+          popupAnchor: [0, -25]
+        });
         const m = L.marker([loc.lat, loc.lon], { icon })
           .bindPopup(`<strong>${name}</strong><br>${ville}<br><em>${loc.info}</em>`);
         m.addTo(map); oms.addMarker(m); markers.push(m);
@@ -205,15 +224,25 @@ function loadDataFromArray(year) {
     } else {
       // Marqueur de groupe
       validateImage(photoMap['Groupe'] || 'images/group.jpg').then(url => {
-        const icon    = L.icon({ iconUrl: url, iconSize: [50,50], iconAnchor: [25,25], popupAnchor: [0,-25] });
-        const groupM  = L.marker([loc.lat, loc.lon], { icon });
+        const icon = L.icon({
+          iconUrl: url,
+          iconSize: [50, 50],
+          iconAnchor: [25, 25],
+          popupAnchor: [0, -25]
+        });
+        const groupM = L.marker([loc.lat, loc.lon], { icon });
         groupM.addTo(map); oms.addMarker(groupM); markers.push(groupM);
 
         group.forEach((name, i) => {
           validateImage(photoMap[name]).then(url2 => {
-            const icon2 = L.icon({ iconUrl: url2, iconSize: [50,50], iconAnchor: [25,25], popupAnchor: [0,-25] });
-            const off   = 0.00005 * i;
-            const m2    = L.marker([loc.lat + off, loc.lon + off], { icon: icon2 })
+            const icon2 = L.icon({
+              iconUrl: url2,
+              iconSize: [50, 50],
+              iconAnchor: [25, 25],
+              popupAnchor: [0, -25]
+            });
+            const off = 0.00005 * i;
+            const m2  = L.marker([loc.lat + off, loc.lon + off], { icon: icon2 })
               .bindPopup(`<strong>${name}</strong><br>${ville}<br><em>${latestLocations[name].info}</em>`);
             m2.addTo(map); oms.addMarker(m2); markers.push(m2);
           });
