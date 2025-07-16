@@ -19,13 +19,16 @@
   </div>
   
   <!-- 👤 Sélecteur de personnes -->
-  <div id="person-selector">
-    <label>Choisir les personnes à afficher :</label>
-    <div id="person-list">
-      <!-- Les cases à cocher seront injectées ici par script.js -->
-    </div>
+<div id="person-selector">
+  <div id="person-header" style="cursor: pointer;">
+    <span>👥 Sélectionner les personnes</span>
+    <span id="toggle-arrow" style="float: right;">▼</span>
+  </div>
+  <div id="person-list-container" style="display: none;">
+    <div id="person-list"></div>
     <button id="hide-all">Tout masquer</button>
   </div>
+</div>
 
   <!-- 📦 Scripts -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
