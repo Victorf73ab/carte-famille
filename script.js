@@ -6,6 +6,15 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 let markers = [];
 
+const personHeader      = document.getElementById('person-header');
+const personSelectorDiv = document.getElementById('person-selector');
+const personListBlock   = document.getElementById('person-list-container');
+
+personHeader.addEventListener('click', () => {
+  const isOpen = personSelectorDiv.classList.toggle('open');
+  personListBlock.style.display = isOpen ? 'block' : 'none';
+});
+
 // 🕷️ OverlappingMarkerSpiderfier
 const oms = new OverlappingMarkerSpiderfier(map, {
   keepSpiderfied: true,
