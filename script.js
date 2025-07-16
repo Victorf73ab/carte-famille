@@ -15,6 +15,7 @@ const oms = new OverlappingMarkerSpiderfier(map, {
 // 🎚️ Récupération des éléments du DOM
 const yearInput     = document.getElementById('year');
 const yearLabel     = document.getElementById('year-label');
+console.log('Div selector existe ?', document.getElementById('person-selector'));
 const selectElement = document.getElementById('person-select');
 const hideAllBtn    = document.getElementById('hide-all');
 
