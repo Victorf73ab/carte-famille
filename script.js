@@ -84,8 +84,8 @@ window.addEventListener('DOMContentLoaded', () => {
       selectElement.appendChild(option);
     });
 
-    console.log('Menu déroulant peuplé avec :', uniqueNames);
-
+    console.log("Menu déroulant rempli avec :", uniqueNames);
+    
     loadDataFromArray(peopleData, photoMap, minYear);
 
     yearInput.addEventListener('input', () => {
