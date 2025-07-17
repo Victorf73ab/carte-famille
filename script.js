@@ -228,7 +228,9 @@ document.addEventListener('DOMContentLoaded', () => {
           m.addTo(map); oms.addMarker(m); markers.push(m);
         });
       } else {
-        validateImage('images/group.jpg').then(url => {
+        // photo de groupe personnalisée depuis Google Sheets
+        const rawGroupPhoto = photoMap["Groupe"] || 'images/group.jpg';
+        validateImage(rawGroupPhoto).then(url => {
           const icon = L.icon({
             iconUrl:    url,
             iconSize:   [50, 50],
