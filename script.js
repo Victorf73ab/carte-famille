@@ -201,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
           if (line.year < year) stopped = true;
         }
       });
-      if (last) latestLocations[name] = last;
+      if (last && !stopped) latestLocations[name] = last;
     });
 
     // 5) groupement par coordonnées pour éviter chevauchement
