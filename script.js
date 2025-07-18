@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // 🗺️ Initialisation de la carte
-  const map = L.map('map').setView([48.0, 15.0], 6);
+  const map = L.map('map').setView([48.0, 15.0], 5);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors'
   }).addTo(map);
