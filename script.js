@@ -204,12 +204,27 @@ document.addEventListener('DOMContentLoaded', () => {
       if (last && !stopped) latestLocations[name] = last;
     });
 
-    // 5) groupement par coordonnées pour éviter chevauchement
-    const locationGroups = {};
-    Object.entries(latestLocations).forEach(([name, loc]) => {
-      const key = `${loc.lat.toFixed(5)}_${loc.lon.toFixed(5)}`;
-      (locationGroups[key] = locationGroups[key] || []).push(name);
-    });
+    // 5) groupement par coordonnées « proches » pour éviter chevauchement
+const threshold = 0.0005;        // ~ 50m
+const locationGroups = {};
+
+Object.entries(latestLocations).forEach(([name, loc]) => {
+  // cherche un key existant à moins du seuil
+  let foundKey = null;
+  for (let key in locationGroups) {
+    const [lat0, lon0] = key.split('_').map(Number);
+    if (
+      Math.abs(lat0 - loc.lat) <= threshold &&
+      Math.abs(lon0 - loc.lon) <= threshold
+    ) {
+      foundKey = key;
+      break;
+    }
+  }
+  // si rien trouvé, crée un nouveau key arrondi à 4 décimales
+  const key = foundKey || `${loc.lat.toFixed(4)}_${loc.lon.toFixed(4)}`;
+  (locationGroups[key] = locationGroups[key] || []).push(name);
+});
 
     // 6) création et ajout des marqueurs
     Object.values(locationGroups).forEach(group => {
