@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
     photoMap   = loadPhotoMap(csvPhotos);
     groupMap   = loadGroupMap(csvGroups);
 
-    // 📅 Configuration du slider (garde-fou si vide)
+    // 📅 Configuration du slider
     const years = peopleData.map(p => p.year).filter(y => !isNaN(y));
     const today = new Date().getFullYear();
     const minY  = years.length ? Math.min(...years) : today;
@@ -214,9 +214,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // 6) création et ajout des marqueurs
     Object.values(locationGroups).forEach(group => {
       const { lat, lon, ville, info } = latestLocations[group[0]];
+
       if (group.length === 1) {
-        const n = group[0];
-        validateImage(photoMap[n]).then(url => {
+        // Affichage d’une seule personne
+        const name = group[0];
+        validateImage(photoMap[name]).then(url => {
           const icon = L.icon({
             iconUrl:    url,
             iconSize:   [50, 50],
@@ -224,11 +226,12 @@ document.addEventListener('DOMContentLoaded', () => {
             popupAnchor:[0, -25]
           });
           const m = L.marker([lat, lon], { icon })
-            .bindPopup(`<strong>${n}</strong><br>${ville}<br><em>${info}</em>`);
+            .bindPopup(`<strong>${name}</strong><br>${ville}<br><em>${info}</em>`);
           m.addTo(map); oms.addMarker(m); markers.push(m);
         });
+
       } else {
-        // photo de groupe personnalisée depuis Google Sheets
+        // Affichage du groupe avec icône "Groupe"
         const rawGroupPhoto = photoMap["Groupe"] || 'images/group.jpg';
         validateImage(rawGroupPhoto).then(url => {
           const icon = L.icon({
@@ -237,20 +240,24 @@ document.addEventListener('DOMContentLoaded', () => {
             iconAnchor: [25, 25],
             popupAnchor:[0, -25]
           });
-          const gm = L.marker([lat, lon], { icon });
+          const gm = L.marker([lat, lon], { icon })
+            .bindPopup(`<strong>${group.length} personnes</strong><br>${ville}<br><em>Cliquez pour détailler</em>`);
           gm.addTo(map); oms.addMarker(gm); markers.push(gm);
 
-          group.forEach((n, i) => {
-            validateImage(photoMap[n]).then(url2 => {
+          // Puis on affiche les individus en décalé
+          group.forEach((name, i) => {
+            const ind = latestLocations[name];
+            const infoInd = ind.info || '';
+            validateImage(photoMap[name]).then(url2 => {
               const icon2 = L.icon({
                 iconUrl:    url2,
                 iconSize:   [50, 50],
                 iconAnchor: [25, 25],
                 popupAnchor:[0, -25]
               });
-              const offset = 0.00005 * i;
-              const m2     = L.marker([lat + offset, lon + offset], { icon: icon2 })
-                .bindPopup(`<strong>${n}</strong><br>${ville}<br><em>${latestLocations[n].info}</em>`);
+              const offset = 0.00005 * (i + 1);
+              const m2 = L.marker([lat + offset, lon + offset], { icon: icon2 })
+                .bindPopup(`<strong>${name}</strong><br>${ind.ville}<br><em>${infoInd}</em>`);
               m2.addTo(map); oms.addMarker(m2); markers.push(m2);
             });
           });
