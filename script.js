@@ -289,4 +289,5 @@ Object.entries(locationGroups).forEach(([key, group]) => {
 
 // ouverture des popups via Spiderfier
 oms.addListener('click', marker => marker.openPopup());
-
+} 
+});
