@@ -227,7 +227,7 @@ Object.entries(latestLocations).forEach(([name, loc]) => {
 });
 
     // 6) création et ajout des marqueurs
-   Object.entries(locationGroups).forEach(([key, group]) => {
+  Object.entries(locationGroups).forEach(([key, group]) => {
   const [lat, lon] = key.split('_').map(Number);
 
   if (group.length === 1) {
@@ -245,7 +245,7 @@ Object.entries(latestLocations).forEach(([name, loc]) => {
       m.addTo(map); oms.addMarker(m); markers.push(m);
     });
   } else {
-    // Affiche toujours l’image "Groupe" au point central
+    // Affichage du groupe avec icône "Groupe"
     const rawGroupPhoto = photoMap["Groupe"] || 'images/group.jpg';
     validateImage(rawGroupPhoto).then(url => {
       const icon = L.icon({
@@ -254,7 +254,6 @@ Object.entries(latestLocations).forEach(([name, loc]) => {
         iconAnchor: [25, 25],
         popupAnchor: [0, -25]
       });
-
       const gm = L.marker([lat, lon], { icon })
         .bindPopup(`<strong>${group.length} personnes</strong><br><em>Cliquez pour les découvrir</em>`);
       gm.addTo(map); oms.addMarker(gm); markers.push(gm);
