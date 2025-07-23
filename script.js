@@ -248,13 +248,13 @@ Object.entries(latestLocations).forEach(([name, loc]) => {
       } else {
         // Affichage du groupe avec icône "Groupe"
         const rawGroupPhoto = photoMap["Groupe"] || 'images/group.jpg';
-        validateImage(rawGroupPhoto).then(url => {
-          const icon = L.icon({
-            iconUrl:    url,
-            iconSize:   [50, 50],
-            iconAnchor: [25, 25],
-            popupAnchor:[0, -25]
-          });
+validateImage(rawGroupPhoto).then(url => {
+  const icon = L.icon({
+    iconUrl: url,
+    iconSize: [50, 50],
+    iconAnchor: [25, 25],
+    popupAnchor:[0, -25]
+  });
           const gm = L.marker([lat, lon], { icon })
             .bindPopup(`<strong>${group.length} personnes</strong><br>${ville}<br><em>Cliquez pour détailler</em>`);
           gm.addTo(map); oms.addMarker(gm); markers.push(gm);
