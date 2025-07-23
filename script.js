@@ -235,58 +235,62 @@ Object.entries(locationGroups).forEach(([key, group]) => {
     const name = group[0];
     const { ville, info } = latestLocations[name];
     validateImage(photoMap[name]).then(url => {
-      const icon = L.icon({
-        iconUrl: url,
-        iconSize: [50, 50],
-        iconAnchor: [25, 25],
-        popupAnchor: [0, -25]
-      });
-      const m = L.marker([lat, lon], { icon })
-        .bindPopup(`<strong>${name}</strong><br>${ville}<br><em>${info}</em>`);
-      m.addTo(map); oms.addMarker(m); markers.push(m);
-    });
-  } else {
-    // Affichage du groupe avec icône "Groupe"
-    const rawGroupPhoto = photoMap["Groupe"] || 'images/group.jpg';
-    validateImage(rawGroupPhoto).then(url => {
-      const icon = L.icon({
-        iconUrl: url,
-        iconSize: [50, 50],
-        iconAnchor: [25, 25],
-        popupAnchor: [0, -25]
-      });
+              const icon = L.icon({
+            iconUrl: url,
+            iconSize: [50, 50],
+            iconAnchor: [25, 25],
+            popupAnchor: [0, -25]
+          });
+          const m = L.marker([lat, lon], { icon })
+            .bindPopup(`<strong>${name}</strong><br>${ville}<br><em>${info}</em>`);
+          m.addTo(map); oms.addMarker(m); markers.push(m);
+        });
+      } else {
+        // Affichage du groupe avec icône "Groupe"
+        const rawGroupPhoto = photoMap["Groupe"] || 'images/group.jpg';
+        validateImage(rawGroupPhoto).then(url => {
+          const icon = L.icon({
+            iconUrl: url,
+            iconSize: [50, 50],
+            iconAnchor: [25, 25],
+            popupAnchor: [0, -25]
+          });
 
-      const gm = L.marker([lat, lon], { icon })
-      gm.addTo(map); oms.addMarker(gm); markers.push(gm);
+          const gm = L.marker([lat, lon], { icon });
+          gm.addTo(map); oms.addMarker(gm); markers.push(gm);
 
-      // Affiche les individus en décalé uniquement après le clic sur le marqueur "Groupe"
-      let revealed = false;
-      gm.on('click', () => {
-        if (revealed) return;
-        revealed = true;
-
-        group.forEach((name, i) => {
-          const ind = latestLocations[name];
-          const infoInd = ind.info || '';
-          validateImage(photoMap[name]).then(url2 => {
-            const icon2 = L.icon({
-              iconUrl: url2,
-              iconSize: [50, 50],
-              iconAnchor: [25, 25],
-              popupAnchor: [0, -25]
-            });
-            const offset = 0.00005 * (i + 1);
-            const m2 = L.marker([lat + offset, lon + offset], { icon: icon2 })
-              .bindPopup(`<strong>${name}</strong><br>${ind.ville}<br><em>${infoInd}</em>`);
-            m2.addTo(map); oms.addMarker(m2); markers.push(m2);
+          // Affiche les individus en décalé uniquement au premier clic
+          let revealed = false;
+          oms.addListener('click', marker => {
+            if (marker === gm && !revealed) {
+              revealed = true;
+              group.forEach((name, i) => {
+                const ind = latestLocations[name];
+                const infoInd = ind.info || '';
+                validateImage(photoMap[name]).then(url2 => {
+                  const icon2 = L.icon({
+                    iconUrl: url2,
+                    iconSize: [50, 50],
+                    iconAnchor: [25, 25],
+                    popupAnchor: [0, -25]
+                  });
+                  const offset = 0.00005 * (i + 1);
+                  const m2 = L.marker([lat + offset, lon + offset], { icon: icon2 })
+                    .bindPopup(`<strong>${name}</strong><br>${ind.ville}<br><em>${infoInd}</em>`);
+                  m2.addTo(map); oms.addMarker(m2); markers.push(m2);
+                });
+              });
+            }
           });
         });
-      });
+      }
+    });
+
+    // ouverture des popups via Spiderfier (sauf icône "Groupe")
+    oms.addListener('click', marker => {
+      // empêche d'ouvrir automatiquement le popup du groupe
+      const url = marker.options.icon?.options.iconUrl || '';
+      if (!url.includes('group.jpg')) marker.openPopup();
     });
   }
-});
-
-// ouverture des popups via Spiderfier
-oms.addListener('click', marker => marker.openPopup());
-} 
 });
