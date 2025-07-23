@@ -227,37 +227,38 @@ Object.entries(latestLocations).forEach(([name, loc]) => {
 });
 
     // 6) création et ajout des marqueurs
-    Object.values(locationGroups).forEach(group => {
-      const { lat, lon, ville, info } = latestLocations[group[0]];
+    Object.entries(locationGroups).forEach(([key, group]) => {
+  const [lat, lon] = key.split('_').map(Number);
 
-      if (group.length === 1) {
-        // Affichage d’une seule personne
-        const name = group[0];
-        validateImage(photoMap[name]).then(url => {
-          const icon = L.icon({
-            iconUrl:    url,
-            iconSize:   [50, 50],
-            iconAnchor: [25, 25],
-            popupAnchor:[0, -25]
-          });
-          const m = L.marker([lat, lon], { icon })
-            .bindPopup(`<strong>${name}</strong><br>${ville}<br><em>${info}</em>`);
-          m.addTo(map); oms.addMarker(m); markers.push(m);
-        });
+  if (group.length === 1) {
+    // Affichage d’une seule personne
+    const name = group[0];
+    const { ville, info } = latestLocations[name];
+    validateImage(photoMap[name]).then(url => {
+      const icon = L.icon({
+        iconUrl: url,
+        iconSize: [50, 50],
+        iconAnchor: [25, 25],
+        popupAnchor: [0, -25]
+      });
+      const m = L.marker([lat, lon], { icon })
+        .bindPopup(`<strong>${name}</strong><br>${ville}<br><em>${info}</em>`);
+      m.addTo(map); oms.addMarker(m); markers.push(m);
+    });
 
-      } else {
-        // Affichage du groupe avec icône "Groupe"
-        const rawGroupPhoto = photoMap["Groupe"] || 'images/group.jpg';
-validateImage(rawGroupPhoto).then(url => {
-  const icon = L.icon({
-    iconUrl: url,
-    iconSize: [50, 50],
-    iconAnchor: [25, 25],
-    popupAnchor:[0, -25]
-  });
-          const gm = L.marker([lat, lon], { icon })
-            .bindPopup(`<strong>${group.length} personnes</strong><br>${ville}<br><em>Cliquez pour détailler</em>`);
-          gm.addTo(map); oms.addMarker(gm); markers.push(gm);
+  } else {
+    // Affichage du groupe avec icône "Groupe"
+    const rawGroupPhoto = photoMap["Groupe"] || 'images/group.jpg';
+    validateImage(rawGroupPhoto).then(url => {
+      const icon = L.icon({
+        iconUrl: url,
+        iconSize: [50, 50],
+        iconAnchor: [25, 25],
+        popupAnchor: [0, -25]
+      });
+      const gm = L.marker([lat, lon], { icon })
+        .bindPopup(`<strong>${group.length} personnes</strong><br><em>Cliquez pour détailler</em>`);
+      gm.addTo(map); oms.addMarker(gm); markers.push(gm);
 
           // Puis on affiche les individus en décalé
           group.forEach((name, i) => {
