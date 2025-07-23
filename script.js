@@ -257,7 +257,6 @@ Object.entries(locationGroups).forEach(([key, group]) => {
       });
 
       const gm = L.marker([lat, lon], { icon })
-        .bindPopup(`<strong>${group.length} personnes</strong><br><em>Cliquez pour les découvrir</em>`);
       gm.addTo(map); oms.addMarker(gm); markers.push(gm);
 
       // Affiche les individus en décalé uniquement après le clic sur le marqueur "Groupe"
