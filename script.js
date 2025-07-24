@@ -217,50 +217,59 @@ document.addEventListener('DOMContentLoaded', () => {
           m.addTo(map); oms.addMarker(m); markers.push(m);
         });
 
-      } else {
-        // Affichage du groupe avec icône "Groupe"
-        const rawGroupPhoto = photoMap["Groupe"] || 'images/group.jpg';
-        validateImage(rawGroupPhoto).then(url => {
-          const icon = L.icon({
-            iconUrl: url,
-            iconSize: [50, 50],
-            iconAnchor: [25, 25],
-            popupAnchor: [0, -25]
-          });
-          const gm = L.marker([lat, lon], { icon });
-          gm.addTo(map); oms.addMarker(gm); markers.push(gm);
+         } else {
+      // Prépare l'icône Groupe
+      const rawGroupPhoto = photoMap["Groupe"] || 'images/group.jpg';
+      validateImage(rawGroupPhoto).then(url => {
+        const icon = L.icon({
+          iconUrl:    url,
+          iconSize:   [50, 50],
+          iconAnchor: [25, 25],
+          popupAnchor:[0, -25]
+        });
 
-          // Au premier clic, révéler directement les membres
-          gm._revealed = false;
-          oms.addListener('click', marker => {
-            if (marker === gm && !gm._revealed) {
-              gm._revealed = true;
-              group.forEach((name, i) => {
-                const ind = latestLocations[name];
-                const infoInd = ind.info || '';
-                const villeInd = ind.ville || '';
-                validateImage(photoMap[name]).then(url2 => {
-                  const icon2 = L.icon({
-                    iconUrl: url2,
-                    iconSize: [50, 50],
-                    iconAnchor: [25, 25],
-                    popupAnchor: [0, -25]
-                  });
-                  const offset = 0.00005 * (i + 1);
-                  const m2 = L.marker([lat + offset, lon + offset], { icon: icon2 })
-                    .bindPopup(`<strong>${name}</strong><br>${villeInd}<br><em>${infoInd}</em>`);
-                  m2.addTo(map); oms.addMarker(m2); markers.push(m2);
+        // Création du marqueur "Groupe"
+        const gm = L.marker([lat, lon], { icon });
+        gm.addTo(map);
+        oms.addMarker(gm);
+        markers.push(gm);
 
-                  // Forcer l’éclatement immédiatement
-                  oms.spiderfy(gm.getLatLng());
-                });
+        // Au premier clic, générer et afficher tous les membres
+        gm.once('click', () => {
+          // Crée un tableau de promesses pour chaque membre
+          const tasks = group.map((name, i) => {
+            const ind = latestLocations[name];
+            return validateImage(photoMap[name]).then(url2 => {
+              const icon2 = L.icon({
+                iconUrl:     url2,
+                iconSize:    [50, 50],
+                iconAnchor:  [25, 25],
+                popupAnchor: [0, -25]
               });
-            }
+              const offset = 0.00005 * (i + 1);
+              const m2 = L.marker([lat + offset, lon + offset], { icon: icon2 })
+                .bindPopup(
+                  `<strong>${name}</strong><br>${ind.ville}<br><em>${ind.info}</em>`
+                );
+              return m2;
+            });
+          });
+
+          // Quand tous sont prêts, on les ajoute puis on spiderfie
+          Promise.all(tasks).then(newMarkers => {
+            newMarkers.forEach(m2 => {
+              m2.addTo(map);
+              oms.addMarker(m2);
+              markers.push(m2);
+            });
+            oms.spiderfy(gm.getLatLng());
           });
         });
-      }
-    });
+      });
+    }
 
-  } // fin de loadDataFromArray
+  }); // fin Object.entries(locationGroups)
 
-}); // fin de DOMContentLoaded
+} // fin loadDataFromArray
+
+}); // fin DOMContentLoaded
