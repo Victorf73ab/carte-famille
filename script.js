@@ -216,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .bindPopup(`<strong>${name}</strong><br>${ville}<br><em>${info}</em>`);
           m.addTo(map); oms.addMarker(m); markers.push(m);
         });
-        } else {
+      } else {
       const rawGroupPhoto = photoMap["Groupe"] || 'images/group.jpg';
       validateImage(rawGroupPhoto).then(url => {
         const icon = L.icon({
@@ -237,9 +237,13 @@ document.addEventListener('DOMContentLoaded', () => {
           const angleStep = (2 * Math.PI) / group.length;
           const radius = 0.0002;
 
-          group.forEach((name, i) => {
+          const tasks = group.map((name, i) => {
             const ind = latestLocations[name];
-            validateImage(photoMap[name]).then(url2 => {
+            const angle = i * angleStep;
+            const dx = Math.cos(angle) * radius;
+            const dy = Math.sin(angle) * radius;
+
+            return validateImage(photoMap[name]).then(url2 => {
               const icon2 = L.icon({
                 iconUrl: url2,
                 iconSize: [50, 50],
@@ -247,13 +251,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 popupAnchor: [0, -25]
               });
 
-              const angle = i * angleStep;
-              const dx = Math.cos(angle) * radius;
-              const dy = Math.sin(angle) * radius;
-
-              const m2 = L.marker([lat + dy, lon + dx], { icon: icon2 })
+              return L.marker([lat + dy, lon + dx], { icon: icon2 })
                 .bindPopup(`<strong>${name}</strong><br>${ind.ville}<br><em>${ind.info}</em>`);
+            });
+          });
 
+          Promise.all(tasks).then(memberMarkers => {
+            memberMarkers.forEach(m2 => {
               m2.addTo(map);
               markers.push(m2);
             });
