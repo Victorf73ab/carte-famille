@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
           m.addTo(map); oms.addMarker(m); markers.push(m);
         });
 
-      } else {
+        } else {
       const rawGroupPhoto = photoMap["Groupe"] || 'images/group.jpg';
       validateImage(rawGroupPhoto).then(url => {
         const icon = L.icon({
@@ -243,21 +243,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 popupAnchor: [0, -25]
               });
               const offset = 0.00005 * (i + 1);
-              const m2 = L.marker([lat + offset, lon + offset], { icon: icon2 })
+              return L.marker([lat + offset, lon + offset], { icon: icon2 })
                 .bindPopup(`<strong>${name}</strong><br>${ind.ville}<br><em>${ind.info}</em>`);
-              return m2;
             });
           });
 
           Promise.all(tasks).then(newMarkers => {
+            // Supprimer le marqueur groupe pour éviter tout conflit visuel
+            map.removeLayer(gm);
+            oms.removeMarker(gm);
+            markers = markers.filter(m => m !== gm);
+
+            // Ajouter les marqueurs individuels
             newMarkers.forEach(m2 => {
               m2.addTo(map);
               oms.addMarker(m2);
               markers.push(m2);
             });
 
-            // Spiderfy une fois tous les marqueurs ajoutés
-            oms.spiderfy(gm.getLatLng());
+            // Déclenche l’éclatement après ajout complet
+            oms.spiderfy(L.latLng(lat, lon));
           });
         });
       });
@@ -265,6 +270,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   }); // fin Object.entries(locationGroups)
 
-} // fin fonction loadDataFromArray
+} // fin de la fonction loadDataFromArray
 
-}); // fin DOMContentLoaded
+}); // fin de DOMContentLoaded
