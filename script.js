@@ -216,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .bindPopup(`<strong>${name}</strong><br>${ville}<br><em>${info}</em>`);
           m.addTo(map); oms.addMarker(m); markers.push(m);
         });
-       } else {
+        } else {
       const rawGroupPhoto = photoMap["Groupe"] || 'images/group.jpg';
       validateImage(rawGroupPhoto).then(url => {
         const icon = L.icon({
@@ -226,64 +226,43 @@ document.addEventListener('DOMContentLoaded', () => {
           popupAnchor: [0, -25]
         });
 
-        const hiddenMarkers = [];
+        const gm = L.marker([lat, lon], { icon });
+        gm.addTo(map);
+        markers.push(gm);
 
-        // Préparer les marqueurs individuels invisibles
-        const prep = group.map((name, i) => {
-          const ind = latestLocations[name];
-          return validateImage(photoMap[name]).then(url2 => {
-            const icon2 = L.icon({
-              iconUrl: url2,
-              iconSize: [50, 50],
-              iconAnchor: [25, 25],
-              popupAnchor: [0, -25]
+        gm.once('click', () => {
+          map.removeLayer(gm);
+          markers = markers.filter(m => m !== gm);
+
+          const angleStep = (2 * Math.PI) / group.length;
+          const radius = 0.0002;
+
+          group.forEach((name, i) => {
+            const ind = latestLocations[name];
+            validateImage(photoMap[name]).then(url2 => {
+              const icon2 = L.icon({
+                iconUrl: url2,
+                iconSize: [50, 50],
+                iconAnchor: [25, 25],
+                popupAnchor: [0, -25]
+              });
+
+              const angle = i * angleStep;
+              const dx = Math.cos(angle) * radius;
+              const dy = Math.sin(angle) * radius;
+
+              const m2 = L.marker([lat + dy, lon + dx], { icon: icon2 })
+                .bindPopup(`<strong>${name}</strong><br>${ind.ville}<br><em>${ind.info}</em>`);
+
+              m2.addTo(map);
+              markers.push(m2);
             });
-            const offset = 0.00005 * (i + 1);
-            const m2 = L.marker([lat + offset, lon + offset], {
-              icon: icon2,
-              opacity: 0 // invisibles au départ
-            }).bindPopup(
-              `<strong>${name}</strong><br>${ind.ville}<br><em>${ind.info}</em>`
-            );
-            return m2;
-          });
-        });
-
-        Promise.all(prep).then(prepared => {
-          prepared.forEach(m => {
-            m.addTo(map);
-            oms.addMarker(m);
-            markers.push(m);
-            hiddenMarkers.push(m);
-          });
-
-          // Marqueur "Groupe" au-dessus
-          const gm = L.marker([lat, lon], { icon });
-          gm.customId = 'group-marker';
-          gm.addTo(map);
-          oms.addMarker(gm);
-          markers.push(gm);
-
-          gm.once('click', () => {
-            map.removeLayer(gm);
-            oms.removeMarker(gm);
-            markers = markers.filter(m => m !== gm);
-
-            hiddenMarkers.forEach(m => m.setOpacity(1));
-            oms.spiderfy(L.latLng(lat, lon));
           });
         });
       });
     }
 
   }); // fin Object.entries(locationGroups)
-
-  // Empêche l'ouverture de popup sur le marqueur groupe
-  oms.addListener('click', marker => {
-    if (marker.customId !== 'group-marker') {
-      marker.openPopup();
-    }
-  });
 
 } // fin de la fonction loadDataFromArray
 
