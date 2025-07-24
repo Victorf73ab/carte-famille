@@ -216,7 +216,8 @@ document.addEventListener('DOMContentLoaded', () => {
             .bindPopup(`<strong>${name}</strong><br>${ville}<br><em>${info}</em>`);
           m.addTo(map); oms.addMarker(m); markers.push(m);
         });
-      } else {
+
+           } else {
       const rawGroupPhoto = photoMap["Groupe"] || 'images/group.jpg';
       validateImage(rawGroupPhoto).then(url => {
         const icon = L.icon({
@@ -228,21 +229,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const gm = L.marker([lat, lon], { icon });
         gm.addTo(map);
+        oms.addMarker(gm);
         markers.push(gm);
 
         gm.once('click', () => {
-          map.removeLayer(gm);
-          markers = markers.filter(m => m !== gm);
-
-          const angleStep = (2 * Math.PI) / group.length;
-          const radius = 0.0002;
-
           const tasks = group.map((name, i) => {
             const ind = latestLocations[name];
-            const angle = i * angleStep;
-            const dx = Math.cos(angle) * radius;
-            const dy = Math.sin(angle) * radius;
-
             return validateImage(photoMap[name]).then(url2 => {
               const icon2 = L.icon({
                 iconUrl: url2,
@@ -250,17 +242,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 iconAnchor: [25, 25],
                 popupAnchor: [0, -25]
               });
-
-              return L.marker([lat + dy, lon + dx], { icon: icon2 })
+              const offset = 0.00005 * (i + 1);
+              const m2 = L.marker([lat + offset, lon + offset], { icon: icon2 })
                 .bindPopup(`<strong>${name}</strong><br>${ind.ville}<br><em>${ind.info}</em>`);
+              return m2;
             });
           });
 
-          Promise.all(tasks).then(memberMarkers => {
-            memberMarkers.forEach(m2 => {
+          Promise.all(tasks).then(newMarkers => {
+            newMarkers.forEach(m2 => {
               m2.addTo(map);
+              oms.addMarker(m2);
               markers.push(m2);
             });
+
+            // Spiderfy une fois tous les marqueurs ajoutés
+            oms.spiderfy(gm.getLatLng());
           });
         });
       });
@@ -268,6 +265,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   }); // fin Object.entries(locationGroups)
 
-} // fin de la fonction loadDataFromArray
+} // fin de loadDataFromArray
 
-}); // fin du DOMContentLoaded
+}); // fin de DOMContentLoaded
