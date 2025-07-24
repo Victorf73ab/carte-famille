@@ -286,11 +286,46 @@ Object.entries(locationGroups).forEach(([key, group]) => {
       }
     });
 
-    // ouverture des popups via Spiderfier (sauf icône "Groupe")
-    oms.addListener('click', marker => {
-      // empêche d'ouvrir automatiquement le popup du groupe
-      const url = marker.options.icon?.options.iconUrl || '';
-      if (!url.includes('group.jpg')) marker.openPopup();
-    });
+   oms.addListener('click', marker => {
+  const url = marker.options.icon?.options.iconUrl || '';
+
+  if (url.includes('group.jpg')) {
+    // Si c’est le marqueur "Groupe", éclater les membres
+    if (!marker._revealedMembers) {
+      marker._revealedMembers = true;
+      const matchedGroup = Object.entries(locationGroups).find(([key]) => {
+        const [lat, lon] = key.split('_').map(Number);
+        return Math.abs(marker.getLatLng().lat - lat) < 0.0001 &&
+               Math.abs(marker.getLatLng().lng - lon) < 0.0001;
+      });
+
+      if (matchedGroup) {
+        const [key, group] = matchedGroup;
+        const [lat, lon] = key.split('_').map(Number);
+        group.forEach((name, i) => {
+          const ind = latestLocations[name];
+          const infoInd = ind.info || '';
+          const villeInd = ind.ville || '';
+          validateImage(photoMap[name]).then(url2 => {
+            const icon2 = L.icon({
+              iconUrl: url2,
+              iconSize: [50, 50],
+              iconAnchor: [25, 25],
+              popupAnchor: [0, -25]
+            });
+            const offset = 0.00005 * (i + 1);
+            const m2 = L.marker([lat + offset, lon + offset], { icon: icon2 })
+              .bindPopup(`<strong>${name}</strong><br>${villeInd}<br><em>${infoInd}</em>`);
+            m2.addTo(map); oms.addMarker(m2); markers.push(m2);
+          });
+        });
+      }
+    }
+  } else {
+    // Marqueur individuel classique → ouvrir le popup
+    marker.openPopup();
+  }
+});
+
   }
 });
