@@ -216,8 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .bindPopup(`<strong>${name}</strong><br>${ville}<br><em>${info}</em>`);
           m.addTo(map); oms.addMarker(m); markers.push(m);
         });
-
-           } else {
+    } else {
       const rawGroupPhoto = photoMap["Groupe"] || 'images/group.jpg';
       validateImage(rawGroupPhoto).then(url => {
         const icon = L.icon({
@@ -282,18 +281,5 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
 } // fin de la fonction loadDataFromArray
-
-}); // fin du DOMContentLoaded
-
-  }); // fin Object.entries(locationGroups)
-
-  // Empêcher Spiderfier d’ouvrir le popup du marqueur "Groupe"
-  oms.addListener('click', marker => {
-    if (marker.customId !== 'group-marker') {
-      marker.openPopup();
-    }
-  });
-
-} // fin de loadDataFromArray
 
 }); // fin du DOMContentLoaded
