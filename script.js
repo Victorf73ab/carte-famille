@@ -217,8 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
           m.addTo(map); oms.addMarker(m); markers.push(m);
         });
 
-      } else {
-      // Prépare l'icône Groupe
+          } else {
       const rawGroupPhoto = photoMap["Groupe"] || 'images/group.jpg';
       validateImage(rawGroupPhoto).then(url => {
         const icon = L.icon({
@@ -228,13 +227,11 @@ document.addEventListener('DOMContentLoaded', () => {
           popupAnchor: [0, -25]
         });
 
-        // Création du marqueur "Groupe"
         const gm = L.marker([lat, lon], { icon });
         gm.addTo(map);
         oms.addMarker(gm);
         markers.push(gm);
 
-        // Au premier clic, générer et afficher tous les membres
         gm.once('click', () => {
           const tasks = group.map((name, i) => {
             const ind = latestLocations[name];
@@ -252,7 +249,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
           });
 
-          // Une fois que tous les marqueurs sont créés
           Promise.all(tasks).then(newMarkers => {
             newMarkers.forEach(m2 => {
               m2.addTo(map);
@@ -260,15 +256,15 @@ document.addEventListener('DOMContentLoaded', () => {
               markers.push(m2);
             });
 
-            // Déclenche immédiatement le spiderfy
+            // Spiderfy une fois tous les marqueurs ajoutés
             oms.spiderfy(gm.getLatLng());
           });
         });
       });
     }
 
-  }); // fin de la boucle locationGroups
+  }); // fin Object.entries(locationGroups)
 
-} // fin de loadDataFromArray
+} // fin fonction loadDataFromArray
 
-}); // fin de DOMContentLoaded
+}); // fin DOMContentLoaded
