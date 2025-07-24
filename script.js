@@ -216,5 +216,69 @@ document.addEventListener('DOMContentLoaded', () => {
             .bindPopup(`<strong>${name}</strong><br>${ville}<br><em>${info}</em>`);
           m.addTo(map); oms.addMarker(m); markers.push(m);
         });
+    } else {
+      const rawGroupPhoto = photoMap["Groupe"] || 'images/group.jpg';
+      validateImage(rawGroupPhoto).then(url => {
+        const icon = L.icon({
+          iconUrl: url,
+          iconSize: [50, 50],
+          iconAnchor: [25, 25],
+          popupAnchor: [0, -25]
+        });
 
-    Et si ça persiste malgré tout, je peux te proposer un petit mécanisme de verrou (ex. setTimeout) pour décaler le spiderfy de 100ms afin d’attendre le rendu complet — mais testons ça d’abord proprement 🎯
+        const gm = L.marker([lat, lon], { icon });
+        gm.customId = 'group-marker';
+        gm.addTo(map);
+        oms.addMarker(gm);
+        markers.push(gm);
+
+        gm.once('click', () => {
+          const tasks = group.map((name, i) => {
+            const ind = latestLocations[name];
+            return validateImage(photoMap[name]).then(url2 => {
+              const icon2 = L.icon({
+                iconUrl: url2,
+                iconSize: [50, 50],
+                iconAnchor: [25, 25],
+                popupAnchor: [0, -25]
+              });
+              const offset = 0.00005 * (i + 1);
+              return L.marker([lat + offset, lon + offset], { icon: icon2 })
+                .bindPopup(`<strong>${name}</strong><br>${ind.ville}<br><em>${ind.info}</em>`);
+            });
+          });
+
+          Promise.all(tasks).then(newMarkers => {
+            // Supprimer le marqueur groupe pour éviter un conflit visuel
+            map.removeLayer(gm);
+            oms.removeMarker(gm);
+            markers = markers.filter(m => m !== gm);
+
+            // Ajouter tous les membres
+            newMarkers.forEach(m2 => {
+              m2.addTo(map);
+              oms.addMarker(m2);
+              markers.push(m2);
+            });
+
+            // 🔒 Ajout d’un léger verrou temporel pour assurer le rendu
+            setTimeout(() => {
+              oms.spiderfy(L.latLng(lat, lon));
+            }, 120); // Délai en millisecondes (ajustable si besoin)
+          });
+        });
+      });
+    }
+
+  }); // fin Object.entries(locationGroups)
+
+  // Empêche Spiderfier d'ouvrir les popups du groupe
+  oms.addListener('click', marker => {
+    if (marker.customId !== 'group-marker') {
+      marker.openPopup();
+    }
+  });
+
+} // fin fonction loadDataFromArray
+
+}); // fin DOMContentLoaded
