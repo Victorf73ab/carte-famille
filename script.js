@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
           m.addTo(map); oms.addMarker(m); markers.push(m);
         });
 
-           } else {
+      } else {
       const rawGroupPhoto = photoMap["Groupe"] || 'images/group.jpg';
       validateImage(rawGroupPhoto).then(url => {
         const icon = L.icon({
@@ -265,6 +265,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   }); // fin Object.entries(locationGroups)
 
-} // fin de loadDataFromArray
+} // fin fonction loadDataFromArray
 
-}); // fin de DOMContentLoaded
+}); // fin DOMContentLoaded
