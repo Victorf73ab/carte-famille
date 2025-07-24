@@ -256,15 +256,17 @@ document.addEventListener('DOMContentLoaded', () => {
           });
 
           // Quand tous sont prêts, on les ajoute puis on spiderfie
-          Promise.all(tasks).then(newMarkers => {
-            newMarkers.forEach(m2 => {
-              m2.addTo(map);
-              oms.addMarker(m2);
-              markers.push(m2);
-            });
-            oms.spiderfy(gm.getLatLng());
-          });
-        });
+         Promise.all(tasks).then(newMarkers => {
+  newMarkers.forEach(m2 => {
+    m2.addTo(map);
+    oms.addMarker(m2);
+    markers.push(m2);
+  });
+
+  // ✅ spiderfy maintenant que tous les marqueurs sont là
+  oms.spiderfy(gm.getLatLng());
+});
+
       });
     }
 
