@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
           m.addTo(map); oms.addMarker(m); markers.push(m);
         });
 
-       } else {
+           } else {
       const rawGroupPhoto = photoMap["Groupe"] || 'images/group.jpg';
       validateImage(rawGroupPhoto).then(url => {
         const icon = L.icon({
@@ -234,8 +234,15 @@ document.addEventListener('DOMContentLoaded', () => {
         markers.push(gm);
 
         gm.once('click', () => {
-          const tasks = group.map(name => {
+          const angleStep = (2 * Math.PI) / group.length;
+          const radius = 0.0002;
+
+          const tasks = group.map((name, i) => {
             const ind = latestLocations[name];
+            const angle = i * angleStep;
+            const dx = Math.cos(angle) * radius;
+            const dy = Math.sin(angle) * radius;
+
             return validateImage(photoMap[name]).then(url2 => {
               const icon2 = L.icon({
                 iconUrl: url2,
@@ -244,13 +251,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 popupAnchor: [0, -25]
               });
 
-              return L.marker([lat, lon], { icon: icon2 })
+              return L.marker([lat + dy, lon + dx], { icon: icon2 })
                 .bindPopup(`<strong>${name}</strong><br>${ind.ville}<br><em>${ind.info}</em>`);
             });
           });
 
           Promise.all(tasks).then(memberMarkers => {
-            // Supprimer le marqueur groupe pour éviter conflit visuel
             map.removeLayer(gm);
             oms.removeMarker(gm);
             markers = markers.filter(m => m !== gm);
@@ -261,12 +267,23 @@ document.addEventListener('DOMContentLoaded', () => {
               markers.push(m2);
             });
 
-            // ✅ Spiderfy immédiatement après ajout
             oms.spiderfy(L.latLng(lat, lon));
           });
         });
       });
     }
+
+  }); // fin Object.entries(locationGroups)
+
+  oms.addListener('click', marker => {
+    if (marker.customId !== 'group-marker') {
+      marker.openPopup();
+    }
+  });
+
+} // fin de la fonction loadDataFromArray
+
+}); // fin du DOMContentLoaded
 
   }); // fin Object.entries(locationGroups)
 
