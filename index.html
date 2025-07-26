@@ -12,16 +12,17 @@
   <!-- 🗺️ Carte -->
   <div id="map"></div>
 
- <div id="year-controls" style="text-align: center; margin-bottom: 10px;">
-  <button id="prev-year">⬅️</button>
-  <span id="year-label" style="font-weight: bold; margin: 0 10px;"></span>
-  <button id="next-year">➡️</button>
-</div>
+ <!-- 🎚️ Timeline -->
+<div id="timeline" style="text-align: center; margin-bottom: 10px;">
+  <div id="year-label" style="font-weight: bold; margin-bottom: 6px;">1993</div>
+  <input type="range" id="year" step="1" />
 
-  <!-- 🎚️ Timeline -->
-  <div id="timeline">
-    <input type="range" id="year" step="1" />
+  <!-- ⬅️➡️ Flèches de navigation -->
+  <div id="year-controls" style="margin-top: 10px;">
+    <button id="prev-year">⬅️</button>
+    <button id="next-year">➡️</button>
   </div>
+</div>
   
   <!-- 👤 Sélecteur de personnes -->
 <div id="person-selector">
