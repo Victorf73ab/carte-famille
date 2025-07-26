@@ -142,4 +142,26 @@ h1, h2 {
   transform: scale(1.1);
   transition: 0.3s ease;
 }
+#year-controls button {
+  background-color: #f0f0f0;
+  border: none;
+  color: #333;
+  font-size: 18px;
+  padding: 8px 14px;
+  margin: 0 5px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+#year-controls button:hover {
+  background-color: #dcdcdc;
+  transform: scale(1.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+#year-controls button:active {
+  transform: scale(0.95);
+  background-color: #c0c0c0;
+}
 
