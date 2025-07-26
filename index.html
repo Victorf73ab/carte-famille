@@ -12,29 +12,41 @@
   <!-- 🗺️ Carte -->
   <div id="map"></div>
 
- <!-- 🎚️ Timeline -->
-<div id="timeline" style="text-align: center; margin-bottom: 10px;">
-  <div id="year-label" style="font-weight: bold; margin-bottom: 6px;">1993</div>
-  <input type="range" id="year" step="1" />
+  <!-- 🎚️ Timeline -->
+  <div id="timeline" style="text-align: center; margin-bottom: 10px;">
+    <!-- 🔢 Affichage de l’année -->
+    <div id="year-label" style="font-weight: bold; margin-bottom: 6px;">1993</div>
 
-  <!-- ⬅️➡️ Flèches de navigation -->
-  <div id="year-controls" style="margin-top: 10px;">
-    <button id="prev-year">⬅️</button>
-    <button id="next-year">➡️</button>
+    <!-- ⏱️ Slider de l’année -->
+    <input type="range" id="year" step="1" />
+
+    <!-- ⬅️➡️ Flèches SVG de navigation -->
+    <div id="year-controls" style="margin-top: 10px;">
+      <button id="prev-year" class="arrow-btn" aria-label="Année précédente">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
+          <path d="M15 6L9 12L15 18" stroke="#007BFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <button id="next-year" class="arrow-btn" aria-label="Année suivante">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
+          <path d="M9 6L15 12L9 18" stroke="#007BFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
   </div>
-</div>
-  
+
   <!-- 👤 Sélecteur de personnes -->
-<div id="person-selector">
-  <div id="person-header" style="cursor: pointer;">
-    <span>👥 Sélectionner les personnes</span>
-    <span id="toggle-arrow" style="float: right;">▼</span>
+  <div id="person-selector">
+    <div id="person-header" style="cursor: pointer;">
+      <span>👥 Sélectionner les personnes</span>
+      <span id="toggle-arrow" style="float: right;">▼</span>
+    </div>
+    <div id="person-list-container" style="display: none;">
+      <div id="person-list"></div>
+      <button id="hide-all">Tout masquer</button>
+    </div>
   </div>
-  <div id="person-list-container" style="display: none;">
-    <div id="person-list"></div>
-    <button id="hide-all">Tout masquer</button>
-  </div>
-</div>
 
   <!-- 📦 Scripts -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
