@@ -24,6 +24,27 @@ document.addEventListener('DOMContentLoaded', () => {
   // Récupération des éléments DOM
   const yearInput = document.getElementById('year');
   const yearLabel = document.getElementById('year-label');
+  const prevBtn = document.getElementById('prev-year');
+const nextBtn = document.getElementById('next-year');
+
+prevBtn.addEventListener('click', () => {
+  const currentYear = parseInt(yearInput.value, 10);
+  if (currentYear > parseInt(yearInput.min)) {
+    yearInput.value = currentYear - 1;
+    yearLabel.textContent = yearInput.value;
+    loadDataFromArray(currentYear - 1);
+  }
+});
+
+nextBtn.addEventListener('click', () => {
+  const currentYear = parseInt(yearInput.value, 10);
+  if (currentYear < parseInt(yearInput.max)) {
+    yearInput.value = currentYear + 1;
+    yearLabel.textContent = yearInput.value;
+    loadDataFromArray(currentYear + 1);
+  }
+});
+
   const personList = document.getElementById('person-list');
   const hideAllBtn = document.getElementById('hide-all');
 
