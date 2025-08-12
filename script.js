@@ -253,7 +253,7 @@ nextBtn.addEventListener('click', () => {
         oms.addMarker(gm);
         markers.push(gm);
 
-        gm.once('click', () => {
+        gm.on('click', () => {
           const angleStep = (2 * Math.PI) / group.length;
           const radius = 0.0002;
 
